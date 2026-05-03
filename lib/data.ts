@@ -1,13 +1,13 @@
 export const site = {
   name: "DJ SWARTHY",
-  tagline: "DJ · PRODUCTOR · SELECTOR",
-  bookingEmail: "booking@djswarthy.es",
+  tagline: "DJ · PRODUCTOR · TODO TERRENO",
+  bookingEmail: "djswarthy@gmail.com",
 
   hero: {
-    overline: "DJ · PRODUCTOR · SELECTOR",
-    headline: "PINCHA TU NOCHE\nCOMO UN PROFESIONAL",
+    overline: "DJ · PRODUCTOR · TODO TERRENO",
+    headline: "MUSIC IS THE ANSWER",
     subheadline:
-      "Más de 15 años llenando pistas. House, disco y electrónica con alma para clubes, festivales y eventos privados.",
+      "Más de 19 años detrás de los platos. Todo terreno donde se necesite: remember, trance, tech house, house y nu disco. Un DJ que se adapta a la sala, al público y al momento.",
     primaryCta: { label: "▶ Escuchar último set", href: "#mixes" },
     secondaryCta: { label: "Conoce a Swarthy", href: "#about" },
   },
@@ -24,12 +24,7 @@ export const site = {
 
   about: {
     headline: "CONOCE A SWARTHY",
-    body: "Quince años detrás de los platos, residencias en Madrid, Barcelona e Ibiza, y un sonido que mezcla house clásico, disco italiano y electrónica orgánica. Sets construidos con paciencia, que respiran y empujan a partes iguales.",
-    stats: [
-      { value: "15+", label: "AÑOS EN CABINA" },
-      { value: "120", label: "SETS / AÑO" },
-      { value: "3", label: "RESIDENCIAS ACTIVAS" },
-    ],
+    body: "Todo empezó en las fiestas del pueblo, con un maletín de vinilos, ganas de hacerlo bien y la certeza de que la música podía cambiar el ambiente de una plaza en cuestión de minutos. Ahí nació Swarthy.\n\nDiecinueve años después, ese instinto sigue intacto. Su corazón late al ritmo del progressive y el trance — esa música que construye paisajes, que sube despacio y te lleva lejos — pero su versatilidad es su sello: de un remember ochentero a un tech house de madrugada, pasando por house melódico o nu disco, ningún estilo le es ajeno y ninguno te dejará indiferente.\n\nUn DJ que no pincha para él, sino para quien llena la sala.",
   },
 
   // "Tu camino al éxito" → "Tu noche con Swarthy"
@@ -59,33 +54,36 @@ export const site = {
   // Cursos → 3 sets destacados
   mixes: [
     {
-      title: "LATE NIGHT CUTS VOL. 04",
+      title: "ÚLTIMO SET EN SOUNDCLOUD",
       tag: "House · Disco",
       year: "2026",
-      length: "72 min",
-      plays: "12.4K",
+      length: "— min",
+      plays: "Escuchar",
       cover: "/images/gallery-1.jpg",
-      url: "#",
+      url: "https://soundcloud.com/dj_swarthy",
+      platform: "soundcloud",
       featured: true,
     },
     {
-      title: "BASEMENT TAPES",
-      tag: "Deep · Italo",
+      title: "DJ SET — VÍDEO EN VIVO",
+      tag: "YouTube · Live",
       year: "2025",
-      length: "65 min",
-      plays: "8.2K",
+      length: "— min",
+      plays: "Ver vídeo",
       cover: "/images/gallery-2.jpg",
-      url: "#",
+      url: "https://www.youtube.com/@dj-swarthy",
+      platform: "youtube",
       featured: false,
     },
     {
-      title: "SALA ROJA RESIDENCY",
-      tag: "Live recording",
+      title: "SESIONES EN VÍDEO",
+      tag: "YouTube · DJ Sets",
       year: "2025",
-      length: "118 min",
-      plays: "21.7K",
+      length: "— min",
+      plays: "Ver canal",
       cover: "/images/gallery-3.jpg",
-      url: "#",
+      url: "https://www.youtube.com/@dj-swarthy",
+      platform: "youtube",
       featured: false,
     },
   ],
@@ -174,22 +172,17 @@ export const site = {
     },
   ],
 
-  // KPIs grandes
-  kpis: [
-    { value: "15+", label: "AÑOS EN ACTIVO" },
-    { value: "1.8K", label: "SETS PINCHADOS" },
-    { value: "47", label: "CIUDADES" },
-    { value: "120K", label: "OYENTES MENSUALES" },
-  ],
+  // KPIs grandes — vacío, sección eliminada
+  kpis: [] as { value: string; label: string }[],
 
-  // "Alumni" → 6 clubs/festivales donde ha tocado
+  // "Alumni" → clubs/festivales donde ha tocado
   venues: [
-    { name: "Sala Apolo", city: "Barcelona", country: "ES", year: "2025", img: "/images/gallery-1.jpg" },
-    { name: "Pacha", city: "Ibiza", country: "ES", year: "2024", img: "/images/gallery-2.jpg" },
-    { name: "Mondo Disko", city: "Madrid", country: "ES", year: "2025", img: "/images/gallery-3.jpg" },
-    { name: "Watergate", city: "Berlin", country: "DE", year: "2024", img: "/images/portrait.jpg" },
-    { name: "Lux Frágil", city: "Lisboa", country: "PT", year: "2025", img: "/images/hero.jpg" },
-    { name: "Sónar", city: "Barcelona", country: "ES", year: "2024", img: "/images/gallery-1.jpg" },
+    { name: "Joy Eslava", city: "Madrid", country: "ES", year: "2025", img: "/images/venue-joy-eslava-2.jpg" },
+    { name: "Sala Taboo", city: "Madrid", country: "ES", year: "2024", img: "/images/venue-sala-taboo.jpg" },
+    { name: "Café La Palma", city: "Madrid", country: "ES", year: "2025", img: "/images/venue-cafe-la-palma.jpg" },
+    { name: "Keeper", city: "Madrid", country: "ES", year: "2024", img: "/images/venue-keeper.jpg" },
+    { name: "Samsara", city: "Madrid", country: "ES", year: "2025", img: "/images/venue-samsara.jpg" },
+    { name: "Mondo Disko", city: "Madrid", country: "ES", year: "2024", img: "/images/venue-mondo-disko.jpg" },
   ],
 
   // Testimonios de promotores / prensa
@@ -202,7 +195,7 @@ export const site = {
     },
     {
       quote:
-        "Pocos selectores tienen su capacidad de leer al público. La pista entera con él hasta el cierre.",
+        "Pocos DJs tienen su capacidad de leer al público. La pista entera con él hasta el cierre.",
       author: "Iván R.",
       role: "Promotor, Mondo Disko",
     },
@@ -266,10 +259,10 @@ export const site = {
   ],
 
   socials: [
-    { label: "Instagram", url: "https://instagram.com" },
-    { label: "SoundCloud", url: "https://soundcloud.com" },
-    { label: "Mixcloud", url: "https://mixcloud.com" },
-    { label: "Spotify", url: "https://open.spotify.com" },
-    { label: "YouTube", url: "https://youtube.com" },
+    { label: "SoundCloud", url: "https://soundcloud.com/dj_swarthy" },
+    { label: "YouTube", url: "https://www.youtube.com/@dj-swarthy" },
+    { label: "Facebook", url: "https://www.facebook.com/profile.php?id=100063486909762" },
+    { label: "X", url: "https://x.com/DjSwarthy" },
+    { label: "TikTok", url: "#" },
   ],
 };

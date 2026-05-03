@@ -17,34 +17,31 @@ export function Venues() {
           </h2>
         </div>
 
-        <div className="grid gap-4 grid-cols-2 md:grid-cols-3">
+        <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
           {site.venues.map((v, i) => (
             <motion.div
               key={v.name + v.year}
-              initial={{ opacity: 0, scale: 0.96 }}
-              whileInView={{ opacity: 1, scale: 1 }}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.5, delay: i * 0.05 }}
-              className="card-lift relative aspect-[4/5] overflow-hidden rounded-2xl border border-border-dark group"
+              transition={{ duration: 0.5, delay: i * 0.07 }}
+              className="card-lift relative aspect-video overflow-hidden rounded-2xl border border-border-dark group"
             >
               <Image
                 src={v.img}
                 alt={v.name}
                 fill
-                className="object-cover saturate-[0.8] transition-all duration-700 group-hover:scale-105 group-hover:saturate-100"
-                sizes="(max-width: 768px) 50vw, 33vw"
+                className="object-cover saturate-0 brightness-75 transition-all duration-700 group-hover:scale-105 group-hover:saturate-[0.6] group-hover:brightness-90"
+                sizes="(max-width: 768px) 100vw, 33vw"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-dark-primary via-dark-primary/40 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
               <div className="absolute bottom-4 left-4 right-4">
-                <div className="text-[10px] uppercase tracking-[0.2em] text-accent-orange">
-                  {v.year}
-                </div>
-                <div className="font-display mt-1 text-xl uppercase md:text-2xl">
+                <div className="font-display text-xl uppercase md:text-2xl text-white">
                   {v.name}
                 </div>
-                <div className="text-sm text-text-secondary">
-                  {v.city}, {v.country}
+                <div className="mt-1 text-xs uppercase tracking-[0.15em] text-accent-orange">
+                  {v.city}
                 </div>
               </div>
             </motion.div>

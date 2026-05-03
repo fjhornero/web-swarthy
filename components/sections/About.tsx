@@ -22,7 +22,7 @@ export function About() {
             <div className="absolute -inset-4 gradient-primary opacity-20 blur-3xl rounded-full" />
             <div className="relative aspect-[4/5] overflow-hidden rounded-2xl border border-border-dark">
               <Image
-                src="/images/portrait.jpg"
+                src="/images/portrait-bw.png"
                 alt="DJ Swarthy"
                 fill
                 className="object-cover"
@@ -41,32 +41,17 @@ export function About() {
               ★ {site.about.headline}
             </div>
             <h2 className="font-display text-4xl uppercase leading-[0.95] md:text-6xl">
-              Quince años<br />
+              19 años<br />
               <span className="text-gradient">en la cabina</span>
             </h2>
-            <p className="mt-6 text-base leading-relaxed text-text-secondary md:text-lg">
-              {site.about.body}
-            </p>
-
-            <div className="mt-10 grid grid-cols-3 gap-4 md:gap-6">
-              {site.about.stats.map((s, i) => (
-                <motion.div
-                  key={s.label}
-                  initial={{ opacity: 0, y: 16 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: 0.1 + i * 0.08 }}
-                  className="rounded-xl border border-border-dark bg-dark-primary/60 p-4 text-center"
-                >
-                  <div className="font-display text-3xl md:text-4xl text-gradient">
-                    {s.value}
-                  </div>
-                  <div className="mt-1 text-[10px] uppercase tracking-[0.15em] text-text-secondary">
-                    {s.label}
-                  </div>
-                </motion.div>
+            <div className="mt-6 space-y-4">
+              {site.about.body.split("\n\n").map((para, i) => (
+                <p key={i} className="text-base leading-relaxed text-text-secondary md:text-lg">
+                  {para}
+                </p>
               ))}
             </div>
+
           </motion.div>
         </div>
       </div>

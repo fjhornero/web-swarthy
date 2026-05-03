@@ -18,11 +18,11 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "DJ Swarthy — Carta de presentación",
   description:
-    "DJ residente, productor y selector. House, disco e italo con alma. Booking abierto en toda Europa.",
+    "DJ todo terreno con más de 19 años de experiencia. Remember, trance, tech house, house y nu disco. Booking abierto.",
   metadataBase: new URL("https://djswarthy.es"),
   openGraph: {
     title: "DJ Swarthy",
-    description: "DJ · Productor · Selector",
+    description: "DJ · Productor · Todo Terreno",
     url: "https://djswarthy.es",
     siteName: "DJ Swarthy",
     locale: "es_ES",

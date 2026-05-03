@@ -1,0 +1,40 @@
+{
+  "success": true,
+  "clones": [
+    {
+      "fileA": "components/sections/HowTo.tsx",
+      "startA": 31,
+      "fileB": "components/sections/Journey.tsx",
+      "startB": 38,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": "components/sections/Guarantee.tsx",
+      "startA": 40,
+      "fileB": "components/sections/Value.tsx",
+      "startB": 15,
+      "lines": 9,
+      "tokens": 0
+    },
+    {
+      "fileA": "components/sections/Formats.tsx",
+      "startA": 31,
+      "fileB": "components/sections/Value.tsx",
+      "startB": 15,
+      "lines": 6,
+      "tokens": 0
+    },
+    {
+      "fileA": "components/sections/Features.tsx",
+      "startA": 38,
+      "fileB": "components/sections/Guarantee.tsx",
+      "startB": 40,
+      "lines": 9,
+      "tokens": 0
+    }
+  ],
+  "duplicatedLines": 31,
+  "totalLines": 2650,
+  "percentage": 1.17
+}

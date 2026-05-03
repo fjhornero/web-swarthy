@@ -1,17 +1,15 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Play, ArrowRight } from "lucide-react";
 import { site } from "@/lib/data";
-import { Countdown } from "@/components/ui/Countdown";
 
 export function Hero() {
   return (
     <section
       id="top"
-      className="relative isolate overflow-hidden bg-dark-primary pt-32 pb-20 md:pt-40 md:pb-28"
+      className="relative isolate overflow-hidden bg-dark-primary min-h-screen pt-32 pb-20 md:pt-40 md:pb-28 flex flex-col justify-center"
     >
       {/* glow rojo difuso de fondo */}
       <div
@@ -34,26 +32,6 @@ export function Hero() {
           {site.hero.overline}
         </motion.div>
 
-        {/* avatar */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.7, delay: 0.1 }}
-          className="mx-auto mb-8 relative h-32 w-32 md:h-40 md:w-40"
-        >
-          <div className="absolute inset-0 -m-2 rounded-full gradient-primary opacity-60 blur-2xl" />
-          <div className="relative h-full w-full overflow-hidden rounded-full border-2 border-border-dark bg-dark-secondary">
-            <Image
-              src="/images/portrait.jpg"
-              alt="DJ Swarthy"
-              fill
-              className="object-cover saturate-0"
-              sizes="160px"
-              priority
-            />
-          </div>
-        </motion.div>
-
         {/* headline */}
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
@@ -61,8 +39,7 @@ export function Hero() {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="font-display text-5xl uppercase leading-[0.95] tracking-tight md:text-7xl lg:text-8xl"
         >
-          PINCHA TU NOCHE<br />
-          COMO UN <span className="text-gradient">PROFESIONAL</span>
+          MUSIC IS THE <span className="text-gradient">ANSWER</span>
         </motion.h1>
 
         {/* sub */}
@@ -98,37 +75,44 @@ export function Hero() {
           </Link>
         </motion.div>
 
-        {/* Countdown a próximo gig */}
+        {/* Ecualizador animado */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.5 }}
-          className="mt-14 mx-auto max-w-2xl"
+          transition={{ duration: 0.9, delay: 0.6 }}
+          className="mt-16 flex flex-col items-center gap-4"
         >
-          <div className="rounded-2xl border border-border-dark bg-dark-secondary/40 backdrop-blur-sm p-6 md:p-8">
-            <div className="mb-4 flex items-center justify-center gap-2 text-xs uppercase tracking-[0.2em] text-accent-orange">
-              <span>★</span> PRÓXIMA FECHA <span>★</span>
-            </div>
-            <div className="text-center mb-2">
-              <span className="font-display text-3xl md:text-4xl text-text-primary">
-                {site.nextGig.venue}
-              </span>
-              <span className="ml-3 text-sm text-text-secondary">
-                {site.nextGig.city}
-              </span>
-            </div>
-            <div className="mt-6 flex justify-center">
-              <Countdown target={new Date(site.nextGig.iso)} size="md" />
-            </div>
-            <div className="mt-6 text-center text-xs text-text-secondary">
-              <span className="text-accent-orange font-semibold">
-                Quedan {site.nextGig.seatsLeft} entradas
-              </span>{" "}
-              · de {site.nextGig.seatsTotal}
-            </div>
-          </div>
+          <Equalizer />
+          <span className="text-[10px] uppercase tracking-[0.4em] text-text-secondary">
+            Madrid · España
+          </span>
         </motion.div>
       </div>
     </section>
+  );
+}
+
+const BAR_DELAYS = [0, 0.15, 0.3, 0.1, 0.25, 0.05, 0.35, 0.2, 0.4, 0.08, 0.28, 0.18, 0.38, 0.12, 0.22, 0.32, 0.06, 0.42];
+const BAR_DURATIONS = [0.7, 0.9, 0.6, 1.1, 0.8, 0.65, 0.95, 0.75, 1.0, 0.85, 0.7, 0.9, 0.6, 1.05, 0.8, 0.7, 0.95, 0.65];
+
+function Equalizer() {
+  return (
+    <div className="flex items-end justify-center gap-1 h-16 w-full max-w-sm">
+      {BAR_DELAYS.map((delay, i) => (
+        <div
+          key={i}
+          style={{
+            width: 6,
+            height: 64,
+            borderRadius: 3,
+            background: "linear-gradient(to top, #e11d48, #f97316)",
+            transformOrigin: "bottom",
+            animation: `eq-bar ${BAR_DURATIONS[i]}s ease-in-out ${delay}s infinite`,
+            boxShadow: "0 0 8px rgba(225,29,72,0.4)",
+            flexShrink: 0,
+          }}
+        />
+      ))}
+    </div>
   );
 }
