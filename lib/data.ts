@@ -267,6 +267,6 @@ export const site = {
     { label: "YouTube", url: "https://www.youtube.com/@dj-swarthy" },
     { label: "Facebook", url: "https://www.facebook.com/profile.php?id=100063486909762" },
     { label: "X", url: "https://x.com/DjSwarthy" },
-    { label: "TikTok", url: "#" },
+    { label: "TikTok", url: "https://www.tiktok.com/@swarthy_dj" },
   ],
 };

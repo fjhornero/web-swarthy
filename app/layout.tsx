@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Bebas_Neue, Inter } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
+import { site } from "@/lib/data";
 
 const bebas = Bebas_Neue({
   variable: "--font-bebas",
@@ -94,9 +95,12 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: "/favicon.ico",
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/logo-isotype.png", type: "image/png" },
+    ],
     shortcut: "/favicon.ico",
-    apple: "/logo-isotype.png",
+    apple: { url: "/logo-isotype.png", sizes: "180x180" },
   },
 };
 
@@ -162,6 +166,15 @@ const jsonLd = {
       description:
         "Servicio de DJ profesional para clubs, festivales, eventos privados y bodas en Madrid y resto de España.",
     },
+    {
+      "@type": "FAQPage",
+      "@id": `${SITE_URL}#faq`,
+      mainEntity: site.faq.map(({ q, a }) => ({
+        "@type": "Question",
+        name: q,
+        acceptedAnswer: { "@type": "Answer", text: a },
+      })),
+    },
   ],
 };
 
@@ -177,6 +190,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://www.youtube.com" />
         <link rel="preconnect" href="https://w.soundcloud.com" />
         <link rel="dns-prefetch" href="https://i.ytimg.com" />
+        <link rel="preconnect" href="https://plausible.io" />
       </head>
       <body className="bg-dark-primary text-text-primary antialiased">
         <Script
@@ -184,6 +198,12 @@ export default function RootLayout({
           type="application/ld+json"
           strategy="beforeInteractive"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+        <Script
+          defer
+          data-domain="djswarthy.es"
+          src="https://plausible.io/js/script.js"
+          strategy="afterInteractive"
         />
         {children}
       </body>
