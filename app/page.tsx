@@ -1,47 +1,40 @@
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { StickyCta } from "@/components/StickyCta";
 import { Hero } from "@/components/sections/Hero";
-import { Video } from "@/components/sections/Video";
 import { About } from "@/components/sections/About";
-import { Journey } from "@/components/sections/Journey";
 import { Mixes } from "@/components/sections/Mixes";
-import { Features } from "@/components/sections/Features";
-import { HowTo } from "@/components/sections/HowTo";
 import { Formats } from "@/components/sections/Formats";
-import { Stats } from "@/components/sections/Stats";
 import { Venues } from "@/components/sections/Venues";
-import { Testimonials } from "@/components/sections/Testimonials";
-import { Value } from "@/components/sections/Value";
-import { Guarantee } from "@/components/sections/Guarantee";
-import { PressKit } from "@/components/sections/PressKit";
 import { Socials } from "@/components/sections/Socials";
 import { Faq } from "@/components/sections/Faq";
 import { FinalCta } from "@/components/sections/FinalCta";
+import { getLatestYouTubeVideos, getLatestSoundCloudTracks } from "@/lib/feeds";
 
-export default function Home() {
+export default async function Home() {
+  const [ytVideos, scTracks] = await Promise.all([
+    getLatestYouTubeVideos(),
+    getLatestSoundCloudTracks(),
+  ]);
+
+  const latestVideo = ytVideos.find((v) => !v.isShort);
+  const latestTrack = scTracks[0];
+
   return (
     <>
       <Navbar />
       <main>
         <Hero />
-        <Video />
         <About />
-        <Journey />
-        <Mixes />
-        <Features />
-        <HowTo />
+        <Mixes latestVideo={latestVideo} latestTrack={latestTrack} />
         <Formats />
-        <Stats />
         <Venues />
-        <Testimonials />
-        <Value />
-        <Guarantee />
-        <PressKit />
         <Socials />
         <Faq />
         <FinalCta />
       </main>
       <Footer />
+      <StickyCta />
     </>
   );
 }

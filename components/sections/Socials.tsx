@@ -2,15 +2,15 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Instagram, Music, Youtube, Disc3, Headphones } from "lucide-react";
+import { Music, Youtube, Disc3, Facebook, Twitter, Music2 } from "lucide-react";
 import { site } from "@/lib/data";
 
 const iconMap: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
-  Instagram,
   SoundCloud: Disc3,
-  Mixcloud: Headphones,
-  Spotify: Music,
   YouTube: Youtube,
+  Facebook: Facebook,
+  X: Twitter,
+  TikTok: Music2,
 };
 
 export function Socials() {
@@ -29,6 +29,7 @@ export function Socials() {
         <div className="grid gap-3 grid-cols-2 md:grid-cols-5">
           {site.socials.map((s, i) => {
             const Icon = iconMap[s.label] ?? Music;
+            const isPending = s.url === "#";
             return (
               <motion.div
                 key={s.label}
@@ -39,13 +40,13 @@ export function Socials() {
               >
                 <Link
                   href={s.url}
-                  target="_blank"
+                  target={isPending ? undefined : "_blank"}
                   rel="noopener noreferrer"
-                  className="card-lift flex items-center gap-3 rounded-xl border border-border-dark bg-dark-primary px-4 py-3 transition-colors hover:border-accent-red/50"
+                  className={`card-lift flex items-center gap-3 rounded-xl border border-border-dark bg-dark-primary px-4 py-3 transition-colors hover:border-accent-red/50 ${isPending ? "opacity-50 pointer-events-none" : ""}`}
                 >
                   <Icon size={20} className="text-accent-orange" />
                   <span className="text-sm font-medium">{s.label}</span>
-                  <span className="ml-auto text-text-secondary">↗</span>
+                  <span className="ml-auto text-text-secondary">{isPending ? "…" : "↗"}</span>
                 </Link>
               </motion.div>
             );
