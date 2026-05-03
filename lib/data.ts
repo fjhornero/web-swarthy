@@ -136,23 +136,23 @@ export const site = {
     {
       name: "SET CLUB",
       duration: "90 — 120 min",
-      price: "Desde 800€",
+      price: "Consultar",
       featured: false,
       includes: [
-        "Vinilo + CDJ",
         "Set personalizado a tu sala",
         "Sound check incluido",
         "Rider técnico estándar",
+        "Trance · House · Tech House",
       ],
     },
     {
       name: "PEAK TIME",
       duration: "2 — 3 h",
-      price: "Desde 1.400€",
+      price: "Consultar",
       featured: true,
       includes: [
         "Todo lo de Set Club",
-        "Selección con vinilos exclusivos",
+        "Selección a medida del público",
         "Visuales sincronizados (opcional)",
         "Meet & greet con promotor",
         "Vídeo del set (extra)",
@@ -161,7 +161,7 @@ export const site = {
     {
       name: "ALL NIGHT LONG",
       duration: "5 — 7 h",
-      price: "A consultar",
+      price: "Consultar",
       featured: false,
       includes: [
         "Todo lo de Peak Time",
@@ -233,28 +233,32 @@ export const site = {
   // FAQ
   faq: [
     {
-      q: "¿Cuál es el cachet base de Swarthy?",
-      a: "Depende del formato y la ciudad. El set club arranca en 800€; peak time desde 1.400€. Escríbenos con los detalles del evento y enviamos propuesta cerrada.",
+      q: "¿Cuál es el cachet de Swarthy?",
+      a: "Varía según el formato (set club, peak time o all night long), la ciudad y la fecha. Escríbenos con los detalles del evento y te enviamos propuesta cerrada en menos de 48h.",
     },
     {
-      q: "¿Pincha solo en vinilo?",
-      a: "No. Combina vinilo y CDJ-3000 según el formato y la sala. Para festivales y picos largos, formato híbrido. Para sesiones íntimas, 100% vinilo siempre que la cabina lo permita.",
+      q: "¿Qué estilos pincha?",
+      a: "Es un DJ todo terreno: trance y progressive como base, pero también tech house, house, nu disco y remember. Cada set se construye en función del público, la sala y la hora.",
     },
     {
-      q: "¿Puedo proponer un setlist o petición?",
-      a: "Por supuesto. Atendemos peticiones del promotor pero el set lo construye Swarthy: él lee la pista mejor que nadie y sabe cuándo soltar cada tema.",
+      q: "¿Puedo proponer un setlist o pedir un estilo concreto?",
+      a: "Por supuesto. Acepta peticiones y briefing del promotor, pero el set lo construye Swarthy: él lee la pista mejor que nadie y sabe cuándo soltar cada tema.",
     },
     {
-      q: "¿Cuánto dura el sound check?",
-      a: "Llegamos 60-90 min antes con todo el equipo. Sound check breve (15-20 min) y revisión de cabina, monitores y CDJs.",
+      q: "¿Cuánto tiempo necesita para sound check?",
+      a: "Llega 60-90 min antes con todo el equipo. Sound check breve (15-20 min) y revisión de cabina, monitores y CDJs.",
     },
     {
-      q: "¿Toca fuera de España?",
-      a: "Sí, gira regular por Berlín, Lisboa, Ámsterdam y París. Para fechas internacionales, mejor con 4-6 semanas de antelación.",
+      q: "¿Toca fuera de Madrid y de España?",
+      a: "Sí. Aunque su base es Madrid, está disponible para fechas en toda España e internacional. Para fuera de España, mejor avisar con 4-6 semanas de antelación.",
     },
     {
-      q: "¿Qué necesito tener en cabina?",
-      a: "2x CDJ-3000 (o equivalente), 1x DJM-A9 o V10, 2x giradiscos Technics 1200 con cápsulas Concorde, y monitor en cabina. El rider completo va en el EPK.",
+      q: "¿Qué equipo técnico necesita en cabina?",
+      a: "Setup estándar: 2x CDJ (CDJ-3000 o equivalente), 1x mixer profesional (DJM-A9, V10 o similar) y monitor en cabina. El rider completo se envía al confirmar la fecha.",
+    },
+    {
+      q: "¿Hace eventos privados, bodas o fiestas de empresa?",
+      a: "Sí. Adapta el repertorio a eventos privados, bodas, cumpleaños y eventos corporativos. Para esos formatos amplía a remember, pop electrónico y selección bailable transversal.",
     },
   ],
 

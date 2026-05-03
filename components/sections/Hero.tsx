@@ -52,6 +52,21 @@ export function Hero() {
           {site.hero.subheadline}
         </motion.p>
 
+        {/* trust bar — géneros */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8, delay: 0.45 }}
+          className="mt-8 flex flex-wrap items-center justify-center gap-x-2 gap-y-2 text-[10px] uppercase tracking-[0.25em] text-text-secondary"
+        >
+          {["Trance", "Progressive", "Tech House", "House", "Nu Disco", "Remember"].map((g, i, arr) => (
+            <span key={g} className="inline-flex items-center gap-2">
+              <span className="text-text-primary">{g}</span>
+              {i < arr.length - 1 && <span className="text-accent-red/60">·</span>}
+            </span>
+          ))}
+        </motion.div>
+
         {/* CTAs */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}

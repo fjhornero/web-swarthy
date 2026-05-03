@@ -21,7 +21,11 @@ export function Footer() {
               </span>
             </Link>
             <p className="mt-4 max-w-xs text-sm text-text-secondary">
-              {site.tagline}. Booking abierto en toda Europa.
+              DJ profesional en Madrid. Trance, house, tech house, nu disco y remember.
+              Booking abierto para clubs, festivales y eventos privados.
+            </p>
+            <p className="mt-3 text-xs text-text-secondary">
+              <span className="uppercase tracking-[0.2em]">Madrid</span> · España
             </p>
           </div>
 
