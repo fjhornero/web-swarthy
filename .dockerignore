@@ -1,0 +1,13 @@
+node_modules
+.next
+.git
+.gitignore
+.env*
+.cursor
+.claude
+.vscode
+.idea
+Dockerfile
+docker-compose.yml
+deploy
+*.log
