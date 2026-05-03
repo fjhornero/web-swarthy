@@ -1,0 +1,199 @@
+"use client";
+
+import { useState, useTransition } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Send, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
+import { submitBooking, type BookingFields } from "@/app/actions/booking";
+
+const inputClass =
+  "w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-text-primary placeholder:text-text-secondary/50 outline-none transition focus:border-accent-red focus:bg-white/8 focus:ring-1 focus:ring-accent-red/40";
+
+const selectClass = inputClass + " appearance-none cursor-pointer";
+
+export function BookingForm() {
+  const [isPending, startTransition] = useTransition();
+  const [result, setResult] = useState<{ success: boolean; error?: string } | null>(null);
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const fd = new FormData(e.currentTarget);
+    const form = e.currentTarget;
+
+    const fields: BookingFields = {
+      nombre: fd.get("nombre") as string,
+      email: fd.get("email") as string,
+      tipoEvento: fd.get("tipoEvento") as string,
+      fecha: fd.get("fecha") as string,
+      ciudad: fd.get("ciudad") as string,
+      formato: fd.get("formato") as string,
+      mensaje: fd.get("mensaje") as string,
+    };
+
+    startTransition(async () => {
+      const res = await submitBooking(fields);
+      setResult(res);
+      if (res?.success) form.reset();
+    });
+  }
+
+  if (result?.success) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="flex flex-col items-center gap-4 rounded-2xl border border-white/10 bg-white/5 px-8 py-12 text-center"
+      >
+        <CheckCircle size={48} className="text-accent-orange" />
+        <h3 className="font-display text-3xl uppercase text-text-primary">
+          ¡Solicitud enviada!
+        </h3>
+        <p className="max-w-sm text-sm text-text-secondary">
+          Swarthy ha recibido tu mensaje. Te responde en menos de 48h con propuesta y disponibilidad.
+        </p>
+        <button
+          onClick={() => setResult(null)}
+          className="mt-2 text-xs uppercase tracking-widest text-accent-orange hover:underline"
+        >
+          Enviar otra solicitud
+        </button>
+      </motion.div>
+    );
+  }
+
+  return (
+    <form
+      onSubmit={handleSubmit}
+      className="rounded-2xl border border-white/10 bg-white/5 p-6 md:p-8 text-left"
+    >
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs uppercase tracking-widest text-text-secondary">
+            Nombre / Empresa *
+          </label>
+          <input
+            name="nombre"
+            type="text"
+            required
+            placeholder="Tu nombre o sala"
+            className={inputClass}
+          />
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs uppercase tracking-widest text-text-secondary">
+            Email de contacto *
+          </label>
+          <input
+            name="email"
+            type="email"
+            required
+            placeholder="promotor@sala.com"
+            className={inputClass}
+          />
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs uppercase tracking-widest text-text-secondary">
+            Tipo de evento *
+          </label>
+          <select name="tipoEvento" required defaultValue="" className={selectClass}>
+            <option value="" disabled>Selecciona…</option>
+            <option value="Club / Discoteca">Club / Discoteca</option>
+            <option value="Festival">Festival</option>
+            <option value="Evento privado">Evento privado</option>
+            <option value="Boda">Boda</option>
+            <option value="Evento corporativo">Evento corporativo</option>
+            <option value="Otro">Otro</option>
+          </select>
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs uppercase tracking-widest text-text-secondary">
+            Formato de set *
+          </label>
+          <select name="formato" required defaultValue="" className={selectClass}>
+            <option value="" disabled>Selecciona…</option>
+            <option value="Set Club (90-120 min)">Set Club — 90/120 min</option>
+            <option value="Peak Time (2-3h)">Peak Time — 2/3h</option>
+            <option value="All Night Long (5-7h)">All Night Long — 5/7h</option>
+          </select>
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs uppercase tracking-widest text-text-secondary">
+            Fecha del evento *
+          </label>
+          <input
+            name="fecha"
+            type="date"
+            required
+            min={new Date().toISOString().split("T")[0]}
+            className={inputClass}
+          />
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs uppercase tracking-widest text-text-secondary">
+            Ciudad *
+          </label>
+          <input
+            name="ciudad"
+            type="text"
+            required
+            placeholder="Madrid, Barcelona…"
+            className={inputClass}
+          />
+        </div>
+
+        <div className="flex flex-col gap-1.5 sm:col-span-2">
+          <label className="text-xs uppercase tracking-widest text-text-secondary">
+            Mensaje adicional
+          </label>
+          <textarea
+            name="mensaje"
+            rows={3}
+            placeholder="Horario estimado, aforo, rider específico o cualquier detalle…"
+            className={inputClass + " resize-none"}
+          />
+        </div>
+      </div>
+
+      <AnimatePresence>
+        {result?.error && (
+          <motion.p
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            className="mt-4 flex items-center gap-2 text-sm text-red-400"
+          >
+            <AlertCircle size={14} />
+            {result.error}
+          </motion.p>
+        )}
+      </AnimatePresence>
+
+      <button
+        type="submit"
+        disabled={isPending}
+        className="group mt-6 inline-flex w-full items-center justify-center gap-3 gradient-primary px-8 py-4 text-sm font-semibold text-white rounded-full shadow-glow-strong transition-all hover:scale-105 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
+      >
+        {isPending ? (
+          <>
+            <Loader2 size={18} className="animate-spin" />
+            Enviando…
+          </>
+        ) : (
+          <>
+            <Send size={18} />
+            Solicitar fecha
+            <span className="transition-transform group-hover:translate-x-1">→</span>
+          </>
+        )}
+      </button>
+
+      <p className="mt-4 text-center text-xs text-text-secondary/60">
+        Respuesta en menos de 48h · Sin agencia · Sin intermediarios
+      </p>
+    </form>
+  );
+}
