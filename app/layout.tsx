@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import { Bebas_Neue, Inter } from "next/font/google";
-import Script from "next/script";
 import "./globals.css";
 import { site } from "@/lib/data";
 
@@ -187,23 +186,20 @@ export default function RootLayout({
       className={`${bebas.variable} ${inter.variable}`}
     >
       <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
         <link rel="preconnect" href="https://www.youtube.com" />
         <link rel="preconnect" href="https://w.soundcloud.com" />
         <link rel="dns-prefetch" href="https://i.ytimg.com" />
         <link rel="preconnect" href="https://plausible.io" />
       </head>
       <body className="bg-dark-primary text-text-primary antialiased">
-        <Script
-          id="ld-json"
-          type="application/ld+json"
-          strategy="beforeInteractive"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
-        <Script
+        <script
           defer
           data-domain="djswarthy.es"
           src="https://plausible.io/js/script.js"
-          strategy="afterInteractive"
         />
         {children}
       </body>
