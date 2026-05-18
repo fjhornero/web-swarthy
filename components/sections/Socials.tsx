@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Music, Youtube, Disc3, Facebook, Twitter, Music2 } from "lucide-react";
+import { Music, Youtube, Disc3, Facebook, Twitter, Music2, Twitch } from "lucide-react";
 import { site } from "@/lib/data";
 
 const iconMap: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
@@ -11,6 +11,7 @@ const iconMap: Record<string, React.ComponentType<{ size?: number; className?: s
   Facebook: Facebook,
   X: Twitter,
   TikTok: Music2,
+  Twitch: Twitch,
 };
 
 export function Socials() {
@@ -26,7 +27,7 @@ export function Socials() {
           </h2>
         </div>
 
-        <div className="grid gap-3 grid-cols-2 md:grid-cols-5">
+        <div className="grid gap-3 grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
           {site.socials.map((s, i) => {
             const Icon = iconMap[s.label] ?? Music;
             const isPending = s.url === "#";
