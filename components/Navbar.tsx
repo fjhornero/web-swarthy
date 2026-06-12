@@ -11,6 +11,7 @@ const links = [
   { href: "#formats", label: "Formatos" },
   { href: "#venues", label: "Clubs" },
   { href: "#faq", label: "FAQ" },
+  { href: "#contacto", label: "Contacto" },
 ];
 
 export function Navbar() {
