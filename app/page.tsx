@@ -8,6 +8,7 @@ import { Formats } from "@/components/sections/Formats";
 import { Venues } from "@/components/sections/Venues";
 import { Socials } from "@/components/sections/Socials";
 import { Faq } from "@/components/sections/Faq";
+import { Contact } from "@/components/sections/Contact";
 import { FinalCta } from "@/components/sections/FinalCta";
 import { getLatestYouTubeVideos, getLatestSoundCloudTracks } from "@/lib/feeds";
 
@@ -31,6 +32,7 @@ export default async function Home() {
         <Venues />
         <Socials />
         <Faq />
+        <Contact />
         <FinalCta />
       </main>
       <Footer />
