@@ -42,9 +42,9 @@ export function Contact() {
           transition={{ duration: 0.6 }}
           className="mb-12 text-center"
         >
-          <span className="mb-4 inline-block rounded-full border border-accent-red/30 bg-accent-red/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-accent-red">
-            Contacto
-          </span>
+          <div className="mb-3 text-xs uppercase tracking-[0.2em] text-accent-orange">
+            ★ CONTACTO
+          </div>
           <h2 className="font-display text-4xl uppercase leading-tight text-text-primary md:text-5xl">
             ¿Tienes alguna{" "}
             <span className="text-gradient">pregunta?</span>
