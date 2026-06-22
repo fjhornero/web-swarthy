@@ -1,6 +1,15 @@
 const YT_CHANNEL_ID = "UCssrEHx7wZR0jvlABi46TNQ";
 const SC_USER_ID = "1764128";
 
+// YouTube limita (429/403) las peticiones de RSS desde IPs de datacenter
+// cuando no llevan un User-Agent de navegador. Sin esto el feed llega vacío
+// en producción y la sección cae al enlace de fallback.
+const FEED_HEADERS = {
+  "User-Agent":
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+  Accept: "application/atom+xml, application/xml, text/xml; q=0.9, */*; q=0.8",
+};
+
 export interface VideoItem {
   id: string;
   title: string;
@@ -21,7 +30,7 @@ export async function getLatestYouTubeVideos(): Promise<VideoItem[]> {
   try {
     const res = await fetch(
       `https://www.youtube.com/feeds/videos.xml?channel_id=${YT_CHANNEL_ID}`,
-      { next: { revalidate: 3600 } }
+      { headers: FEED_HEADERS, next: { revalidate: 3600 } }
     );
     if (!res.ok) return [];
     const xml = await res.text();
@@ -64,7 +73,7 @@ export async function getLatestSoundCloudTracks(): Promise<TrackItem[]> {
   try {
     const res = await fetch(
       `https://feeds.soundcloud.com/users/soundcloud:users:${SC_USER_ID}/sounds.rss`,
-      { next: { revalidate: 3600 } }
+      { headers: FEED_HEADERS, next: { revalidate: 3600 } }
     );
     if (!res.ok) return [];
     const xml = await res.text();
