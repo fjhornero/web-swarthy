@@ -69,7 +69,7 @@ export function Mixes({ latestVideo, latestTrack }: MixesProps) {
               </>
             ) : (
               <FallbackCard
-                href="https://www.youtube.com/@dj-swarthy"
+                href="https://www.youtube.com/@swarthy_dj"
                 label="Ver canal de YouTube"
               />
             )}

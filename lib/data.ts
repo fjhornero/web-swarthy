@@ -71,7 +71,7 @@ export const site = {
       length: "— min",
       plays: "Ver vídeo",
       cover: "/images/gallery-2.jpg",
-      url: "https://www.youtube.com/@dj-swarthy",
+      url: "https://www.youtube.com/@swarthy_dj",
       platform: "youtube",
       featured: false,
     },
@@ -82,7 +82,7 @@ export const site = {
       length: "— min",
       plays: "Ver canal",
       cover: "/images/gallery-3.jpg",
-      url: "https://www.youtube.com/@dj-swarthy",
+      url: "https://www.youtube.com/@swarthy_dj",
       platform: "youtube",
       featured: false,
     },
@@ -264,7 +264,7 @@ export const site = {
 
   socials: [
     { label: "SoundCloud", url: "https://soundcloud.com/dj_swarthy" },
-    { label: "YouTube", url: "https://www.youtube.com/@dj-swarthy" },
+    { label: "YouTube", url: "https://www.youtube.com/@swarthy_dj" },
     { label: "Facebook", url: "https://www.facebook.com/profile.php?id=100063486909762" },
     { label: "X", url: "https://x.com/DjSwarthy" },
     { label: "TikTok", url: "https://www.tiktok.com/@swarthy_dj" },

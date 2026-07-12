@@ -132,7 +132,7 @@ const jsonLd = {
       ],
       sameAs: [
         "https://soundcloud.com/dj_swarthy",
-        "https://www.youtube.com/@dj-swarthy",
+        "https://www.youtube.com/@swarthy_dj",
         "https://www.facebook.com/profile.php?id=100063486909762",
         "https://x.com/DjSwarthy",
       ],
