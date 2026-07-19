@@ -41,10 +41,12 @@ export function Mixes({ latestVideo, latestTrack }: MixesProps) {
               <>
                 <div className="relative aspect-video w-full">
                   <iframe
-                    src={`https://www.youtube.com/embed/${latestVideo.id}?rel=0`}
+                    src={`https://www.youtube-nocookie.com/embed/${latestVideo.id}?rel=0`}
                     title={latestVideo.title}
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
+                    loading="lazy"
+                    referrerPolicy="strict-origin-when-cross-origin"
                     className="absolute inset-0 h-full w-full"
                   />
                 </div>
@@ -95,6 +97,7 @@ export function Mixes({ latestVideo, latestTrack }: MixesProps) {
                     scrolling="no"
                     frameBorder="no"
                     allow="autoplay"
+                    loading="lazy"
                     src={`https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/${latestTrack.id}&color=%23e11d48&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false&visual=true`}
                     className="w-full"
                     style={{ height: 300 }}

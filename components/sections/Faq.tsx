@@ -36,6 +36,7 @@ export function Faq() {
                   onClick={() => setOpen(isOpen ? null : i)}
                   className="w-full flex items-center justify-between gap-4 px-6 py-5 text-left transition-colors hover:bg-dark-tertiary md:px-8"
                   aria-expanded={isOpen}
+                  aria-controls={`faq-panel-${i}`}
                 >
                   <span className="text-base font-semibold text-text-primary md:text-lg">
                     {f.q}
@@ -50,6 +51,7 @@ export function Faq() {
                 <AnimatePresence initial={false}>
                   {isOpen && (
                     <motion.div
+                      id={`faq-panel-${i}`}
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: "auto", opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}

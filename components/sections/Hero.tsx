@@ -79,7 +79,7 @@ export function Hero() {
             className="group inline-flex items-center gap-2 gradient-primary px-7 py-4 text-sm font-semibold text-white rounded-full shadow-glow-strong transition-transform hover:scale-105"
           >
             <Play size={16} className="fill-white" />
-            {site.hero.primaryCta.label.replace("▶ ", "")}
+            {site.hero.primaryCta.label}
           </Link>
           <Link
             href={site.hero.secondaryCta.href}

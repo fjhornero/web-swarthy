@@ -18,7 +18,7 @@ const inter = Inter({
 
 const SITE_URL = "https://djswarthy.es";
 const SITE_NAME = "DJ Swarthy";
-const OG_IMAGE = "/images/portrait-bw.png";
+const OG_IMAGE = "/images/og.jpg";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -68,8 +68,8 @@ export const metadata: Metadata = {
     images: [
       {
         url: OG_IMAGE,
-        width: 868,
-        height: 1209,
+        width: 864,
+        height: 1212,
         alt: "DJ Swarthy",
       },
     ],
@@ -190,12 +190,18 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-        <link rel="preconnect" href="https://www.youtube.com" />
+        <link rel="preconnect" href="https://www.youtube-nocookie.com" />
         <link rel="preconnect" href="https://w.soundcloud.com" />
         <link rel="dns-prefetch" href="https://i.ytimg.com" />
         <link rel="preconnect" href="https://plausible.io" />
       </head>
       <body className="bg-dark-primary text-text-primary antialiased">
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:rounded-full focus:bg-dark-secondary focus:px-5 focus:py-3 focus:text-sm focus:text-text-primary"
+        >
+          Saltar al contenido
+        </a>
         <script
           defer
           data-domain="djswarthy.es"

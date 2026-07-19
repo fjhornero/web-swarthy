@@ -1,56 +1,49 @@
 "use server";
 
+import {
+  EMAIL_REGEX,
+  FIELD_LIMITS,
+  escapeHtml,
+  sendTelegramMessage,
+} from "@/lib/telegram";
+
 export type ContactState = { success: boolean; error?: string } | null;
 
 export type ContactFields = {
   nombre: string;
   email: string;
   mensaje: string;
+  // honeypot: los humanos no lo ven; si llega relleno es un bot
+  web?: string;
 };
 
 export async function submitContact(fields: ContactFields): Promise<ContactState> {
-  const { nombre, email, mensaje } = fields;
+  if (fields.web) {
+    // Bot detectado: respondemos éxito sin enviar nada
+    return { success: true };
+  }
+
+  const nombre = fields.nombre?.trim().slice(0, FIELD_LIMITS.short);
+  const email = fields.email?.trim().slice(0, FIELD_LIMITS.email);
+  const mensaje = fields.mensaje?.trim().slice(0, FIELD_LIMITS.message);
 
   if (!nombre || !email || !mensaje) {
     return { success: false, error: "Completa todos los campos obligatorios." };
   }
 
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+  if (!EMAIL_REGEX.test(email)) {
     return { success: false, error: "El email no tiene un formato válido." };
   }
 
   const lines = [
-    "✉️ *NUEVO MENSAJE DE CONTACTO — DJ SWARTHY*",
+    "✉️ <b>NUEVO MENSAJE DE CONTACTO — DJ SWARTHY</b>",
     "",
-    `👤 *Nombre:* ${nombre}`,
-    `📧 *Email:* ${email}`,
-    `💬 *Mensaje:* ${mensaje}`,
+    `👤 <b>Nombre:</b> ${escapeHtml(nombre)}`,
+    `📧 <b>Email:</b> ${escapeHtml(email)}`,
+    `💬 <b>Mensaje:</b> ${escapeHtml(mensaje)}`,
     "",
-    `📩 Responder a: ${email}`,
+    `📩 Responder a: ${escapeHtml(email)}`,
   ];
 
-  try {
-    const res = await fetch(
-      `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          chat_id: process.env.TELEGRAM_CHAT_ID,
-          text: lines.join("\n"),
-          parse_mode: "Markdown",
-        }),
-      }
-    );
-
-    if (!res.ok) {
-      console.error("Telegram error:", await res.text());
-      return { success: false, error: "No se pudo enviar. Inténtalo de nuevo." };
-    }
-
-    return { success: true };
-  } catch (e) {
-    console.error("Contact network error:", e);
-    return { success: false, error: "Error de conexión. Inténtalo de nuevo." };
-  }
+  return sendTelegramMessage(lines.join("\n"));
 }
