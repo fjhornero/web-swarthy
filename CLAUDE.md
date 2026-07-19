@@ -22,36 +22,22 @@ If `npm run dev` (and `npx next ...`) returns a truncated "Errors: 1 | Warnings:
 
 Single long-scroll landing page modeled after the **DJSwarthy Academy** reference site (`https://fictional-octo-guacamole-rose.vercel.app/`). The visual identity (palette, typography, gradient, glow, structure) is copied from that reference; the content is rewritten as an **artist presentation site** (booking, sets, fechas) instead of a course landing.
 
-- `app/page.tsx` — composes 17 sections in order: Hero → Video → About → Journey → Mixes → Features → HowTo → Formats → Stats → Venues → Testimonials → Value → Guarantee → PressKit → Socials → Faq → FinalCta. Reorder by editing this file alone; sections do not depend on each other.
-- `app/layout.tsx` — loads two Google fonts (`Bebas Neue` → display, `Inter` → body) and exposes them as `--font-bebas` and `--font-inter`.
+- `app/page.tsx` — async server component that fetches the latest YouTube video + SoundCloud track (`lib/feeds.ts`, revalidated hourly) and composes 9 sections in order: Hero → About → Mixes → Formats → Venues → Socials → Faq → Contact → FinalCta. Reorder by editing this file alone; sections do not depend on each other (FinalCta embeds BookingForm).
+- `app/layout.tsx` — loads two Google fonts (`Bebas Neue` → display, `Inter` → body) and exposes them as `--font-bebas` and `--font-inter`. Also carries the full SEO surface: metadata + OpenGraph/Twitter (`/images/og.jpg`), JSON-LD (`MusicGroup`, `WebSite`, `Service`, `FAQPage` built from `site.faq`) and the Plausible analytics script (`data-domain="djswarthy.es"`).
+- `app/actions/booking.ts` / `app/actions/contact.ts` — server actions that forward form submissions to a Telegram chat via `lib/telegram.ts` (needs `TELEGRAM_BOT_TOKEN` + `TELEGRAM_CHAT_ID` env vars). Both validate/trim fields server-side and silently accept honeypot (`web` field) submissions.
+- `lib/feeds.ts` — regex-parses the public YouTube RSS and SoundCloud RSS feeds (no API keys). Sends a browser User-Agent because YouTube 429s datacenter IPs otherwise. Returns `[]` on any failure; `Mixes` falls back to plain channel links.
+- `app/sitemap.ts`, `app/robots.ts`, `app/api/health/route.ts` — sitemap, robots (disallows `/api/`), and the healthcheck endpoint used by docker-compose.
 - `app/globals.css` — Tailwind v4 `@theme` block declares the design tokens. Renaming a token here renames the utility class everywhere. Custom utilities defined in `@layer utilities` are the brand primitives:
   - `gradient-primary` — the rojo→naranja diagonal gradient (`#e11d48 → #f97316`) used on CTAs, badges, step circles, value-stack footer.
   - `text-gradient` — same gradient applied to text via `background-clip: text`. Used on every section heading's accent word.
-  - `gradient-glow` / `gradient-glow-orange` — the radial red/orange halo used as ambient background glow behind hero, stats, press-kit, final CTA.
+  - `gradient-glow` / `gradient-glow-orange` — the radial red/orange halo used as ambient background glow behind hero, contact and final CTA.
   - `shadow-glow` / `shadow-glow-strong` — the colored drop-shadow under primary buttons and featured cards.
   - `pulse-dot` — the keyframe used by "live" badge dots.
-  - `card-lift` — uniform hover-lift for cards (mixes, venues, socials).
-- `lib/data.ts` — single source of truth for all placeholder content (hero copy, nextGig, bio + stats, journey 4 steps, mixes, features, howTo, formats with includes lists, KPIs, venues, testimonials, value stack, pressKit, socials, FAQ). Sections import from here; replacing copy never touches component files.
-- `components/sections/*` — one file per section. Client components when they animate via Framer Motion (most of them); server components when purely static.
-- `components/Navbar.tsx`, `components/Footer.tsx` — chrome.
-- `components/ui/Countdown.tsx` — live `DD : HH : MM : SS` counter to a target Date. Used in the Hero with `site.nextGig.iso` as target.
-- `public/images/` — placeholder photography (Behance refs); `public/logo-isotype.png` and `public/logo-wordmark.png` are the artist's logos. The isotype is rendered with `className="invert"` (black silhouette → white).
-
-### Brand mapping (reference → this site)
-
-The reference is a **course landing**; this is an **artist site**. Every section reuses the *form* of the reference but the *content* maps differently:
-
-| Reference section | Here |
-|---|---|
-| Course launch countdown | Countdown to next gig |
-| Course offering cards | 3 destacados sets |
-| Course features icons | "Por qué Swarthy" |
-| 3-step enrollment | 3-step booking flow |
-| Course tiers comparison | Set formats (Club / Peak Time / All Night Long) |
-| Alumni grid (with clubs) | Venues / festivals where he played |
-| ROI calc / value stack | "Qué incluye el cachet" |
-| 30-day guarantee | "Respuesta en 48h + EPK + contrato" |
-| Free PDF guide download | EPK / press kit download |
+  - `card-lift` — uniform hover-lift for cards (venues, socials).
+- `lib/data.ts` — single source of truth for the static content (hero copy, bio, formats with includes lists, venues, FAQ, socials). Sections import from here; replacing copy never touches component files.
+- `components/sections/*` — one file per section, all client components animated with Framer Motion. `BookingForm` (inside FinalCta, anchor `#booking`) and `Contact` (anchor `#contacto`) submit to the Telegram server actions.
+- `components/Navbar.tsx`, `components/Footer.tsx`, `components/StickyCta.tsx` — chrome. StickyCta is the mobile-only floating "Contratar" button linking to `#booking`.
+- `public/images/` — venue photos + portrait; `public/logo-isotype.png` and `public/logo-wordmark.png` are the artist's logos. The isotype is rendered with `className="invert"` (black silhouette → white). `og.jpg` is the compressed OpenGraph image.
 
 **Do not drift back to "club neon" or "editorial cinematic" aesthetics** — both were tried and rejected. The locked direction is the reference URL above.
 
@@ -70,8 +56,6 @@ Target server: `ssh root@212.227.41.45` (existing nginx + certbot + n8n stack). 
 
 ## Not yet wired
 
-- Booking and form actions are visual only (`mailto:` links + alerts). No SMTP, no n8n webhook, no backend route.
-- All copy in `lib/data.ts` is placeholder. Bio, mixes, tour dates, testimonials, venues, FAQ — all fictitious until the artist provides real material.
-- No analytics, no sitemap.xml, no robots.txt, custom favicon still default.
+- Forms require `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` in the container environment; without them submissions fail with a generic error.
 - No CI/CD — deploys are manual `git pull && docker compose up -d --build` over SSH.
-- Press-kit PDF (`href="#"`) needs a real file in `public/`.
+- No EPK/press-kit download on the site (section was removed until a real PDF exists).

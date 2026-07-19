@@ -24,7 +24,7 @@ export default async function Home() {
   return (
     <>
       <Navbar />
-      <main>
+      <main id="main-content">
         <Hero />
         <About />
         <Mixes latestVideo={latestVideo} latestTrack={latestTrack} />

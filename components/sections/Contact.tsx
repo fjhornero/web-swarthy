@@ -21,6 +21,7 @@ export function Contact() {
       nombre: fd.get("nombre") as string,
       email: fd.get("email") as string,
       mensaje: fd.get("mensaje") as string,
+      web: fd.get("web") as string,
     };
 
     startTransition(async () => {
@@ -85,29 +86,45 @@ export function Contact() {
               onSubmit={handleSubmit}
               className="rounded-2xl border border-white/10 bg-white/5 p-6 md:p-8 text-left"
             >
+              {/* honeypot anti-spam: oculto para humanos, los bots lo rellenan */}
+              <input
+                type="text"
+                name="web"
+                tabIndex={-1}
+                autoComplete="off"
+                aria-hidden="true"
+                className="absolute -left-[9999px] h-0 w-0 opacity-0"
+              />
+
               <div className="flex flex-col gap-4">
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs uppercase tracking-widest text-text-secondary">
+                    <label htmlFor="contact-nombre" className="text-xs uppercase tracking-widest text-text-secondary">
                       Nombre *
                     </label>
                     <input
+                      id="contact-nombre"
                       name="nombre"
                       type="text"
                       required
+                      maxLength={120}
+                      autoComplete="name"
                       placeholder="Tu nombre"
                       className={inputClass}
                     />
                   </div>
 
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs uppercase tracking-widest text-text-secondary">
+                    <label htmlFor="contact-email" className="text-xs uppercase tracking-widest text-text-secondary">
                       Email *
                     </label>
                     <input
+                      id="contact-email"
                       name="email"
                       type="email"
                       required
+                      maxLength={200}
+                      autoComplete="email"
                       placeholder="tu@email.com"
                       className={inputClass}
                     />
@@ -115,13 +132,15 @@ export function Contact() {
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs uppercase tracking-widest text-text-secondary">
+                  <label htmlFor="contact-mensaje" className="text-xs uppercase tracking-widest text-text-secondary">
                     Mensaje *
                   </label>
                   <textarea
+                    id="contact-mensaje"
                     name="mensaje"
                     rows={5}
                     required
+                    maxLength={2000}
                     placeholder="Cuéntanos en qué podemos ayudarte…"
                     className={inputClass + " resize-none"}
                   />

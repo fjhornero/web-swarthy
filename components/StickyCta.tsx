@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { Mail } from "lucide-react";
 import { useEffect, useState } from "react";
-import { site } from "@/lib/data";
 
 export function StickyCta() {
   const [visible, setVisible] = useState(false);
@@ -22,7 +21,7 @@ export function StickyCta() {
       }`}
     >
       <Link
-        href={`mailto:${site.bookingEmail}?subject=Booking%20DJ%20Swarthy`}
+        href="#booking"
         className="flex items-center justify-center gap-2 gradient-primary px-6 py-4 text-sm font-semibold text-white rounded-full shadow-glow-strong"
       >
         <Mail size={16} />

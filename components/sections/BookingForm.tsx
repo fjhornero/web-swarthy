@@ -27,6 +27,7 @@ export function BookingForm() {
       ciudad: fd.get("ciudad") as string,
       formato: fd.get("formato") as string,
       mensaje: fd.get("mensaje") as string,
+      web: fd.get("web") as string,
     };
 
     startTransition(async () => {
@@ -65,38 +66,54 @@ export function BookingForm() {
       onSubmit={handleSubmit}
       className="rounded-2xl border border-white/10 bg-white/5 p-6 md:p-8 text-left"
     >
+      {/* honeypot anti-spam: oculto para humanos, los bots lo rellenan */}
+      <input
+        type="text"
+        name="web"
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden="true"
+        className="absolute -left-[9999px] h-0 w-0 opacity-0"
+      />
+
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="flex flex-col gap-1.5">
-          <label className="text-xs uppercase tracking-widest text-text-secondary">
+          <label htmlFor="booking-nombre" className="text-xs uppercase tracking-widest text-text-secondary">
             Nombre / Empresa *
           </label>
           <input
+            id="booking-nombre"
             name="nombre"
             type="text"
             required
+            maxLength={120}
+            autoComplete="name"
             placeholder="Tu nombre o sala"
             className={inputClass}
           />
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <label className="text-xs uppercase tracking-widest text-text-secondary">
+          <label htmlFor="booking-email" className="text-xs uppercase tracking-widest text-text-secondary">
             Email de contacto *
           </label>
           <input
+            id="booking-email"
             name="email"
             type="email"
             required
+            maxLength={200}
+            autoComplete="email"
             placeholder="promotor@sala.com"
             className={inputClass}
           />
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <label className="text-xs uppercase tracking-widest text-text-secondary">
+          <label htmlFor="booking-tipo" className="text-xs uppercase tracking-widest text-text-secondary">
             Tipo de evento *
           </label>
-          <select name="tipoEvento" required defaultValue="" className={selectClass}>
+          <select id="booking-tipo" name="tipoEvento" required defaultValue="" className={selectClass}>
             <option value="" disabled>Selecciona…</option>
             <option value="Club / Discoteca">Club / Discoteca</option>
             <option value="Festival">Festival</option>
@@ -108,10 +125,10 @@ export function BookingForm() {
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <label className="text-xs uppercase tracking-widest text-text-secondary">
+          <label htmlFor="booking-formato" className="text-xs uppercase tracking-widest text-text-secondary">
             Formato de set *
           </label>
-          <select name="formato" required defaultValue="" className={selectClass}>
+          <select id="booking-formato" name="formato" required defaultValue="" className={selectClass}>
             <option value="" disabled>Selecciona…</option>
             <option value="Set Club (90-120 min)">Set Club — 90/120 min</option>
             <option value="Peak Time (2-3h)">Peak Time — 2/3h</option>
@@ -120,10 +137,11 @@ export function BookingForm() {
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <label className="text-xs uppercase tracking-widest text-text-secondary">
+          <label htmlFor="booking-fecha" className="text-xs uppercase tracking-widest text-text-secondary">
             Fecha del evento *
           </label>
           <input
+            id="booking-fecha"
             name="fecha"
             type="date"
             required
@@ -133,25 +151,29 @@ export function BookingForm() {
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <label className="text-xs uppercase tracking-widest text-text-secondary">
+          <label htmlFor="booking-ciudad" className="text-xs uppercase tracking-widest text-text-secondary">
             Ciudad *
           </label>
           <input
+            id="booking-ciudad"
             name="ciudad"
             type="text"
             required
+            maxLength={120}
             placeholder="Madrid, Barcelona…"
             className={inputClass}
           />
         </div>
 
         <div className="flex flex-col gap-1.5 sm:col-span-2">
-          <label className="text-xs uppercase tracking-widest text-text-secondary">
+          <label htmlFor="booking-mensaje" className="text-xs uppercase tracking-widest text-text-secondary">
             Mensaje adicional
           </label>
           <textarea
+            id="booking-mensaje"
             name="mensaje"
             rows={3}
+            maxLength={2000}
             placeholder="Horario estimado, aforo, rider específico o cualquier detalle…"
             className={inputClass + " resize-none"}
           />

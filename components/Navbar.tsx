@@ -66,7 +66,9 @@ export function Navbar() {
         </Link>
 
         <button
-          aria-label="Abrir menú"
+          aria-label={open ? "Cerrar menú" : "Abrir menú"}
+          aria-expanded={open}
+          aria-controls="mobile-menu"
           className="md:hidden text-text-primary"
           onClick={() => setOpen((v) => !v)}
         >
@@ -75,7 +77,7 @@ export function Navbar() {
       </div>
 
       {open && (
-        <div className="md:hidden border-t border-border-dark bg-dark-primary">
+        <div id="mobile-menu" className="md:hidden border-t border-border-dark bg-dark-primary">
           <nav className="flex flex-col px-5 py-2">
             {links.map((l) => (
               <Link
