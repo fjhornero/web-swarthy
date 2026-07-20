@@ -31,7 +31,7 @@ export function Venues() {
                 src={v.img}
                 alt={v.name}
                 fill
-                className="object-cover saturate-0 brightness-75 transition-all duration-700 group-hover:scale-105 group-hover:saturate-[0.6] group-hover:brightness-90"
+                className="object-cover saturate-[0.55] brightness-90 transition-all duration-700 group-hover:scale-105 group-hover:saturate-100 group-hover:brightness-100"
                 sizes="(max-width: 768px) 100vw, 33vw"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />

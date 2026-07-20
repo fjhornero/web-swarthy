@@ -12,6 +12,14 @@ export const site = {
     secondaryCta: { label: "Conoce a Swarthy", href: "#about" },
   },
 
+  // Barra de cifras (stat band) — datos verificables, sin inventar
+  stats: [
+    { value: "19", label: "Años en cabina" },
+    { value: "6", label: "Estilos que domina" },
+    { value: "100%", label: "En directo, sin playback" },
+    { value: "Madrid", label: "Base · toda España" },
+  ],
+
   about: {
     headline: "CONOCE A SWARTHY",
     body: "Todo empezó en las fiestas del pueblo, con un maletín de vinilos, ganas de hacerlo bien y la certeza de que la música podía cambiar el ambiente de una plaza en cuestión de minutos. Ahí nació Swarthy.\n\nDiecinueve años después, ese instinto sigue intacto. Su corazón late al ritmo del progressive y el trance — esa música que construye paisajes, que sube despacio y te lleva lejos — pero su versatilidad es su sello: de un remember ochentero a un tech house de madrugada, pasando por house melódico o nu disco, ningún estilo le es ajeno y ninguno te dejará indiferente.\n\nUn DJ que no pincha para él, sino para quien llena la sala.",
@@ -22,7 +30,6 @@ export const site = {
     {
       name: "SET CLUB",
       duration: "90 — 120 min",
-      price: "Consultar",
       featured: false,
       includes: [
         "Set personalizado a tu sala",
@@ -34,7 +41,6 @@ export const site = {
     {
       name: "PEAK TIME",
       duration: "2 — 3 h",
-      price: "Consultar",
       featured: true,
       includes: [
         "Todo lo de Set Club",
@@ -47,7 +53,6 @@ export const site = {
     {
       name: "ALL NIGHT LONG",
       duration: "5 — 7 h",
-      price: "Consultar",
       featured: false,
       includes: [
         "Todo lo de Peak Time",

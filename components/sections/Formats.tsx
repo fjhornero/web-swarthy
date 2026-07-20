@@ -45,18 +45,18 @@ export function Formats() {
                 </div>
               )}
 
-              <div className="text-xs uppercase tracking-[0.2em] text-text-secondary">
-                {f.duration}
-              </div>
-              <h3 className="font-display mt-2 text-3xl uppercase md:text-4xl">
+              <h3 className="font-display text-3xl uppercase md:text-4xl">
                 {f.name}
               </h3>
               <div
-                className={`mt-4 font-display text-4xl ${
+                className={`mt-4 font-display text-4xl md:text-5xl ${
                   f.featured ? "text-gradient" : "text-text-primary"
                 }`}
               >
-                {f.price}
+                {f.duration}
+              </div>
+              <div className="mt-1 text-xs uppercase tracking-[0.2em] text-text-secondary">
+                Cachet a medida · propuesta en 48h
               </div>
 
               <ul className="mt-6 space-y-3">
