@@ -2,6 +2,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { StickyCta } from "@/components/StickyCta";
 import { Hero } from "@/components/sections/Hero";
+import { Stats } from "@/components/sections/Stats";
 import { About } from "@/components/sections/About";
 import { Mixes } from "@/components/sections/Mixes";
 import { Formats } from "@/components/sections/Formats";
@@ -26,6 +27,7 @@ export default async function Home() {
       <Navbar />
       <main id="main-content">
         <Hero />
+        <Stats />
         <About />
         <Mixes latestVideo={latestVideo} latestTrack={latestTrack} />
         <Formats />
