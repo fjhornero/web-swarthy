@@ -10,6 +10,21 @@ interface MixesProps {
   latestTrack?: TrackItem;
 }
 
+// Las fechas llegan en formatos distintos (YouTube en ISO 8601, SoundCloud en
+// RFC 2822), pero ambos los parsea Date. Las normalizamos a español para que
+// las dos tarjetas muestren el mismo estilo.
+const dateFormatter = new Intl.DateTimeFormat("es-ES", {
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+});
+
+function formatDate(raw: string): string {
+  if (!raw) return "";
+  const d = new Date(raw);
+  return isNaN(d.getTime()) ? "" : dateFormatter.format(d);
+}
+
 export function Mixes({ latestVideo, latestTrack }: MixesProps) {
   return (
     <section id="mixes" className="relative bg-dark-secondary py-20 md:py-28">
@@ -56,7 +71,7 @@ export function Mixes({ latestVideo, latestTrack }: MixesProps) {
                   </p>
                   <div className="mt-3 flex items-center justify-between">
                     <span className="text-xs text-text-secondary">
-                      {latestVideo.publishedAt.slice(0, 10)}
+                      {formatDate(latestVideo.publishedAt)}
                     </span>
                     <Link
                       href={latestVideo.url}
@@ -110,7 +125,7 @@ export function Mixes({ latestVideo, latestTrack }: MixesProps) {
                   </p>
                   <div className="mt-3 flex items-center justify-between">
                     <span className="text-xs text-text-secondary">
-                      {latestTrack.publishedAt.slice(0, 16)}
+                      {formatDate(latestTrack.publishedAt)}
                     </span>
                     <Link
                       href={latestTrack.url}

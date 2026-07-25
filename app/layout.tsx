@@ -130,12 +130,7 @@ const jsonLd = {
         "Nu Disco",
         "Remember",
       ],
-      sameAs: [
-        "https://soundcloud.com/dj_swarthy",
-        "https://www.youtube.com/@swarthy_dj",
-        "https://www.facebook.com/profile.php?id=100063486909762",
-        "https://x.com/DjSwarthy",
-      ],
+      sameAs: site.socials.map((s) => s.url),
       address: {
         "@type": "PostalAddress",
         addressLocality: "Madrid",
