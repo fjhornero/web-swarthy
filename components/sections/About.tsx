@@ -22,7 +22,7 @@ export function About() {
             <div className="absolute -inset-4 gradient-primary opacity-20 blur-3xl rounded-full" />
             <div className="relative aspect-[4/5] overflow-hidden rounded-2xl border border-border-dark">
               <Image
-                src="/images/portrait-bw.png"
+                src="/images/portrait-bw.webp"
                 alt="DJ Swarthy"
                 fill
                 className="object-cover"
