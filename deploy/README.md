@@ -59,7 +59,74 @@ docker exec <nombre-contenedor-nginx> nginx -s reload
 sudo nginx -s reload
 ```
 
-## Actualizaciones
+## Despliegue automatico (GitHub Actions)
+
+Cada push a `main` dispara `.github/workflows/deploy.yml`: primero corre el CI
+(lint + tipos + build) y, solo si pasa, entra por SSH a este servidor y hace el
+build de la imagen **aqui mismo**. No hay registry: la imagen se construye y se
+queda en `212.227.41.45`.
+
+Secuencia exacta en el servidor:
+
+1. `git fetch --prune origin` y `git reset --hard <sha-del-push>`
+2. `docker compose build`
+3. `docker compose up -d --remove-orphans`
+4. Sondea `http://127.0.0.1:3001/api/health` cada 3s hasta 90s
+5. Si no responde: vuelca los ultimos 80 logs, hace `git reset --hard` al commit
+   anterior, reconstruye, y el workflow falla en rojo
+
+Es decir, una web rota nunca se queda publicada.
+
+### Secrets a crear en GitHub
+
+En `Settings -> Secrets and variables -> Actions -> New repository secret`:
+
+| Secret | Valor |
+| --- | --- |
+| `DEPLOY_HOST` | `212.227.41.45` |
+| `DEPLOY_USER` | `root` (mejor un usuario `deploy` en el grupo `docker`) |
+| `DEPLOY_PATH` | ruta del clone en el servidor, p.ej. `/opt/web-swarthy` |
+| `DEPLOY_SSH_KEY` | clave **privada** ed25519 sin passphrase, entera con cabecera y pie |
+| `DEPLOY_SSH_KNOWN_HOSTS` | salida de `ssh-keyscan -H 212.227.41.45` |
+| `DEPLOY_PORT` | opcional, solo si SSH no escucha en el 22 |
+
+Y opcionalmente, en la pestana *Variables*, `HEALTH_URL` si cambias el puerto
+publicado en `docker-compose.yml`.
+
+### Generar la clave de despliegue
+
+En tu maquina (no reutilices tu clave personal):
+
+```bash
+ssh-keygen -t ed25519 -C "github-actions-web-swarthy" -f ~/.ssh/web_swarthy_deploy -N ""
+
+# autorizarla en el servidor
+ssh-copy-id -i ~/.ssh/web_swarthy_deploy.pub root@212.227.41.45
+
+# el contenido de estos dos comandos es lo que pegas en los secrets
+cat ~/.ssh/web_swarthy_deploy        # -> DEPLOY_SSH_KEY
+ssh-keyscan -H 212.227.41.45         # -> DEPLOY_SSH_KNOWN_HOSTS
+```
+
+### Requisitos en el servidor antes del primer push
+
+```bash
+ssh root@212.227.41.45
+cd /opt/web-swarthy
+git remote -v                 # debe apuntar a github.com/fjhornero/web-swarthy
+git checkout main
+ls -la .env.local             # TELEGRAM_BOT_TOKEN y TELEGRAM_CHAT_ID
+which curl || apt-get install -y curl
+```
+
+`.env.local` esta en `.gitignore`, asi que `git reset --hard` no lo toca: se
+queda entre despliegues.
+
+### Lanzarlo a mano
+
+Actions -> Deploy -> *Run workflow*. Util para redesplegar sin commit nuevo.
+
+## Actualizaciones manuales
 
 ```bash
 ssh root@212.227.41.45
