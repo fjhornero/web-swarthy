@@ -43,12 +43,14 @@ Single long-scroll landing page modeled after the **DJSwarthy Academy** referenc
 
 ## Deployment
 
-Target server: `ssh root@212.227.41.45` (existing nginx + certbot + n8n stack). The compose **does not publish ports to the host** — nginx reaches the container over a shared Docker network (default `nginx_default`; verify and edit `docker-compose.yml` before first deploy).
+Target server: `ssh root@212.227.41.45` (existing nginx + certbot + n8n stack). **nginx runs on the host, not in Docker** — the compose publishes the container only on the loopback (`127.0.0.1:3001 -> 3000`) and nginx `proxy_pass`es to it. The image is built and stored on that same server; there is no registry.
 
 - `Dockerfile` — multi-stage (deps → builder → runner). `node:20-alpine`, runs as non-root, executes `node server.js` from the `standalone` output.
 - `docker-compose.yml` — single `web` service joined to external `proxy` network. Healthcheck against `localhost:3000`.
-- `deploy/nginx-djswarthy.conf` — sample vhost: HTTP→HTTPS redirect, www → apex canonicalization, `proxy_pass http://web-swarthy:3000`.
-- `deploy/README.md` — first-deploy and update walkthrough.
+- `deploy/nginx-djswarthy.conf` — sample vhost: HTTP→HTTPS redirect, www → apex canonicalization, `proxy_pass` to the published loopback port.
+- `deploy/README.md` — first-deploy and update walkthrough, plus the GitHub secrets the pipeline needs.
+- `.github/workflows/ci.yml` — lint + `tsc --noEmit` + `next build` on every PR and non-main push. Also exposed as `workflow_call`.
+- `.github/workflows/deploy.yml` — on push to `main`: runs CI, then SSHes into the server, `git reset --hard` to the pushed SHA, `docker compose build && up -d`, polls `/api/health`, and **rolls back to the previous commit** if the healthcheck never goes green.
 
 ## Domains
 
@@ -57,5 +59,4 @@ Target server: `ssh root@212.227.41.45` (existing nginx + certbot + n8n stack). 
 ## Not yet wired
 
 - Forms require `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` in the container environment; without them submissions fail with a generic error.
-- No CI/CD — deploys are manual `git pull && docker compose up -d --build` over SSH.
 - No EPK/press-kit download on the site (section was removed until a real PDF exists).
