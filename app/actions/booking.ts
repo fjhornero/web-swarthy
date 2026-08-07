@@ -6,6 +6,10 @@ import {
   escapeHtml,
   sendTelegramMessage,
 } from "@/lib/telegram";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+
+const RATE_LIMIT = 3;
+const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 
 export type BookingState = { success: boolean; error?: string } | null;
 
@@ -25,6 +29,14 @@ export async function submitBooking(fields: BookingFields): Promise<BookingState
   if (fields.web) {
     // Bot detectado: respondemos éxito sin enviar nada
     return { success: true };
+  }
+
+  const ip = await getClientIp();
+  if (!checkRateLimit(`booking:${ip}`, RATE_LIMIT, RATE_LIMIT_WINDOW_MS)) {
+    return {
+      success: false,
+      error: "Demasiadas solicitudes. Inténtalo de nuevo en unos minutos.",
+    };
   }
 
   const nombre = fields.nombre?.trim().slice(0, FIELD_LIMITS.short);
