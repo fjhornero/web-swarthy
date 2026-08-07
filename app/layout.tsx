@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Bebas_Neue, Inter } from "next/font/google";
 import "./globals.css";
-import { site } from "@/lib/data";
+import { SITE_URL, SITE_NAME, OG_IMAGE, jsonLdString } from "@/lib/json-ld";
 
 const bebas = Bebas_Neue({
   variable: "--font-bebas",
@@ -15,10 +15,6 @@ const inter = Inter({
   subsets: ["latin"],
   display: "swap",
 });
-
-const SITE_URL = "https://djswarthy.es";
-const SITE_NAME = "DJ Swarthy";
-const OG_IMAGE = "/images/og.jpg";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -110,68 +106,6 @@ export const viewport: Viewport = {
   maximumScale: 5,
 };
 
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "MusicGroup",
-      "@id": `${SITE_URL}#artist`,
-      name: "DJ Swarthy",
-      alternateName: ["Swarthy", "Dj Swarthy"],
-      url: SITE_URL,
-      image: `${SITE_URL}${OG_IMAGE}`,
-      description:
-        "DJ con más de 19 años pinchando trance, progressive, tech house, house, nu disco y remember. Booking abierto en Madrid y toda España.",
-      genre: [
-        "Trance",
-        "Progressive",
-        "Tech House",
-        "House",
-        "Nu Disco",
-        "Remember",
-      ],
-      sameAs: site.socials.map((s) => s.url),
-      address: {
-        "@type": "PostalAddress",
-        addressLocality: "Madrid",
-        addressRegion: "Madrid",
-        addressCountry: "ES",
-      },
-      areaServed: [
-        { "@type": "City", name: "Madrid" },
-        { "@type": "Country", name: "España" },
-      ],
-      email: "djswarthy@gmail.com",
-    },
-    {
-      "@type": "WebSite",
-      "@id": `${SITE_URL}#website`,
-      url: SITE_URL,
-      name: SITE_NAME,
-      inLanguage: "es-ES",
-      publisher: { "@id": `${SITE_URL}#artist` },
-    },
-    {
-      "@type": "Service",
-      name: "Contratación DJ Swarthy",
-      provider: { "@id": `${SITE_URL}#artist` },
-      areaServed: { "@type": "Country", name: "España" },
-      serviceType: "DJ Booking",
-      description:
-        "Servicio de DJ profesional para clubs, festivales, eventos privados y bodas en Madrid y resto de España.",
-    },
-    {
-      "@type": "FAQPage",
-      "@id": `${SITE_URL}#faq`,
-      mainEntity: site.faq.map(({ q, a }) => ({
-        "@type": "Question",
-        name: q,
-        acceptedAnswer: { "@type": "Answer", text: a },
-      })),
-    },
-  ],
-};
-
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
@@ -183,7 +117,7 @@ export default function RootLayout({
       <head>
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          dangerouslySetInnerHTML={{ __html: jsonLdString }}
         />
         <link rel="preconnect" href="https://www.youtube-nocookie.com" />
         <link rel="preconnect" href="https://w.soundcloud.com" />
