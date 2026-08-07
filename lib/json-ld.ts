@@ -1,13 +1,5 @@
-// JSON-LD estructurado + su hash SHA-256, compartido entre app/layout.tsx
-// (para renderizarlo) y next.config.ts (para autorizarlo en la CSP vía hash).
-//
-// Usamos un hash en vez de un nonce por request a propósito: un nonce exige
-// leer headers() en el layout, lo que fuerza renderizado dinámico en toda la
-// app y rompe la revalidación estática horaria de la home (ver app/page.tsx).
-// El contenido de este script es 100% estático por build, así que un hash es
-// la opción correcta — sigue siendo válido en las páginas servidas desde caché.
+// JSON-LD estructurado usado por app/layout.tsx.
 
-import crypto from "node:crypto";
 import { site } from "./data";
 
 export const SITE_URL = "https://djswarthy.es";
@@ -70,8 +62,3 @@ export const jsonLd = {
 };
 
 export const jsonLdString = JSON.stringify(jsonLd);
-
-export const jsonLdScriptHash = `'sha256-${crypto
-  .createHash("sha256")
-  .update(jsonLdString)
-  .digest("base64")}'`;
