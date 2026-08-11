@@ -1,8 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Clock, MapPin } from "lucide-react";
+import { Clock, MapPin, MessageCircle } from "lucide-react";
 import { BookingForm } from "./BookingForm";
+import { site } from "@/lib/data";
 
 export function FinalCta() {
   return (
@@ -46,6 +47,22 @@ export function FinalCta() {
               Madrid · Toda España
             </span>
           </div>
+
+          {/* Vía rápida: en booking la conversación real acaba en WhatsApp.
+              Sin número configurado en lib/data.ts el botón no se renderiza. */}
+          {site.whatsapp && (
+            <a
+              href={`https://wa.me/${site.whatsapp}?text=${encodeURIComponent(
+                "Hola Swarthy, quiero consultar disponibilidad para una fecha."
+              )}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-6 inline-flex items-center gap-2 rounded-full border border-border-dark bg-dark-secondary px-6 py-3 text-sm font-semibold text-text-primary transition-colors hover:border-accent-red/50"
+            >
+              <MessageCircle size={16} className="text-accent-orange" />
+              O escríbele por WhatsApp
+            </a>
+          )}
         </motion.div>
 
         <motion.div

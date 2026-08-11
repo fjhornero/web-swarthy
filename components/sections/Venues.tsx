@@ -27,14 +27,35 @@ export function Venues() {
               transition={{ duration: 0.5, delay: i * 0.07 }}
               className="card-lift relative aspect-video overflow-hidden rounded-2xl border border-border-dark group"
             >
-              <Image
-                src={v.img}
-                alt={v.name}
-                fill
-                className="object-cover saturate-[0.55] brightness-90 transition-all duration-700 group-hover:scale-105 group-hover:saturate-100 group-hover:brightness-100"
-                sizes="(max-width: 768px) 100vw, 33vw"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+              {v.img ? (
+                <>
+                  <Image
+                    src={v.img}
+                    alt={`${v.name}, ${v.city}`}
+                    fill
+                    className="object-cover saturate-[0.55] brightness-90 transition-all duration-700 group-hover:scale-105 group-hover:saturate-100 group-hover:brightness-100"
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                </>
+              ) : (
+                // Sin foto de la sala: tratamiento tipográfico en vez de una
+                // imagen que rompa la coherencia de la rejilla.
+                <>
+                  <div className="absolute inset-0 bg-dark-secondary" />
+                  <div
+                    aria-hidden
+                    className="pointer-events-none absolute -inset-x-8 -bottom-16 h-40 gradient-glow opacity-70"
+                  />
+                  <div
+                    aria-hidden
+                    className="absolute inset-0 flex items-center justify-center font-display text-7xl uppercase text-white/5 md:text-8xl"
+                  >
+                    {v.name.slice(0, 2)}
+                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+                </>
+              )}
 
               <span className="absolute top-3 right-3 rounded-full border border-white/15 bg-black/50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.15em] text-white backdrop-blur-sm">
                 {v.year}

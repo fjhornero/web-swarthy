@@ -34,11 +34,12 @@ export function Footer() {
               Navegación
             </h3>
             <ul className="mt-4 space-y-2 text-sm">
-              <li><Link href="#about" className="hover:text-accent-orange">Sobre Swarthy</Link></li>
-              <li><Link href="#mixes" className="hover:text-accent-orange">Sets</Link></li>
-              <li><Link href="#formats" className="hover:text-accent-orange">Formatos</Link></li>
-              <li><Link href="#faq" className="hover:text-accent-orange">FAQ</Link></li>
-              <li><Link href="#booking" className="hover:text-accent-orange">Booking</Link></li>
+              <li><Link href="/#about" className="hover:text-accent-orange">Sobre Swarthy</Link></li>
+              <li><Link href="/#mixes" className="hover:text-accent-orange">Sets</Link></li>
+              <li><Link href="/#formats" className="hover:text-accent-orange">Formatos</Link></li>
+              <li><Link href="/#faq" className="hover:text-accent-orange">FAQ</Link></li>
+              <li><Link href="/#booking" className="hover:text-accent-orange">Booking</Link></li>
+              <li><Link href="/press-kit" className="hover:text-accent-orange">Press kit</Link></li>
             </ul>
           </div>
 
@@ -71,7 +72,12 @@ export function Footer() {
 
         <div className="mt-12 flex flex-col gap-3 border-t border-border-dark pt-6 text-xs uppercase tracking-[0.2em] text-text-secondary md:flex-row md:items-center md:justify-between">
           <span>© {new Date().getFullYear()} DJ SWARTHY</span>
-          <span>djswarthy.es</span>
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+            <Link href="/privacidad" className="hover:text-accent-orange">
+              Privacidad
+            </Link>
+            <span>djswarthy.es</span>
+          </div>
         </div>
       </div>
     </footer>

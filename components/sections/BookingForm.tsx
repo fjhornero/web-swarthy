@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Send, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 import { submitBooking, type BookingFields } from "@/app/actions/booking";
+import { ConsentCheckbox } from "@/components/ConsentCheckbox";
 
 const inputClass =
   "w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-text-primary placeholder:text-text-secondary/50 outline-none transition focus:border-accent-red focus:bg-white/8 focus:ring-1 focus:ring-accent-red/40";
@@ -22,11 +23,14 @@ export function BookingForm() {
     const fields: BookingFields = {
       nombre: fd.get("nombre") as string,
       email: fd.get("email") as string,
+      telefono: fd.get("telefono") as string,
       tipoEvento: fd.get("tipoEvento") as string,
       fecha: fd.get("fecha") as string,
       ciudad: fd.get("ciudad") as string,
+      aforo: fd.get("aforo") as string,
       formato: fd.get("formato") as string,
       mensaje: fd.get("mensaje") as string,
+      consentimiento: fd.get("consentimiento") === "on",
       web: fd.get("web") as string,
     };
 
@@ -110,6 +114,35 @@ export function BookingForm() {
         </div>
 
         <div className="flex flex-col gap-1.5">
+          <label htmlFor="booking-telefono" className="text-xs uppercase tracking-widest text-text-secondary">
+            Teléfono / WhatsApp
+          </label>
+          <input
+            id="booking-telefono"
+            name="telefono"
+            type="tel"
+            maxLength={40}
+            autoComplete="tel"
+            placeholder="+34 600 000 000"
+            className={inputClass}
+          />
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="booking-aforo" className="text-xs uppercase tracking-widest text-text-secondary">
+            Aforo estimado
+          </label>
+          <select id="booking-aforo" name="aforo" defaultValue="" className={selectClass}>
+            <option value="">Selecciona…</option>
+            <option value="Menos de 150">Menos de 150</option>
+            <option value="150 - 300">150 — 300</option>
+            <option value="300 - 600">300 — 600</option>
+            <option value="600 - 1.000">600 — 1.000</option>
+            <option value="Más de 1.000">Más de 1.000</option>
+          </select>
+        </div>
+
+        <div className="flex flex-col gap-1.5">
           <label htmlFor="booking-tipo" className="text-xs uppercase tracking-widest text-text-secondary">
             Tipo de evento *
           </label>
@@ -179,6 +212,8 @@ export function BookingForm() {
           />
         </div>
       </div>
+
+      <ConsentCheckbox id="booking-consent" />
 
       <AnimatePresence>
         {result?.error && (

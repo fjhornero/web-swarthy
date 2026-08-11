@@ -17,6 +17,8 @@ export type ContactFields = {
   nombre: string;
   email: string;
   mensaje: string;
+  // Consentimiento RGPD: es la base legal del tratamiento, obligatorio
+  consentimiento: boolean;
   // honeypot: los humanos no lo ven; si llega relleno es un bot
   web?: string;
 };
@@ -45,6 +47,15 @@ export async function submitContact(fields: ContactFields): Promise<ContactState
 
   if (!EMAIL_REGEX.test(email)) {
     return { success: false, error: "El email no tiene un formato válido." };
+  }
+
+  // Se revalida en servidor: la casilla del formulario es la base legal del
+  // tratamiento y un envío programático podría saltársela.
+  if (!fields.consentimiento) {
+    return {
+      success: false,
+      error: "Necesitamos tu consentimiento para tratar los datos del formulario.",
+    };
   }
 
   const lines = [

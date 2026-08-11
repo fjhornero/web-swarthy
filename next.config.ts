@@ -34,6 +34,15 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  // Miniaturas de los feeds de YouTube y SoundCloud. Se sirven optimizadas
+  // desde /_next/image (mismo origen), así que no hace falta abrir img-src.
+  images: {
+    remotePatterns: [
+      // YouTube reparte las miniaturas entre i.ytimg.com e i1/i2/i3/i4.ytimg.com
+      { protocol: "https", hostname: "*.ytimg.com" },
+      { protocol: "https", hostname: "*.sndcdn.com" },
+    ],
+  },
   async headers() {
     return [
       {
