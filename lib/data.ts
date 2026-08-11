@@ -70,26 +70,28 @@ export const site = {
   // cita ni ninguna contratación a un negocio que existe de verdad.
 
   // Próximas fechas. Las pasadas se filtran solas (ver lib/dates.ts).
+  // Salas reales del circuito de Swarthy (las mismas de `venues`), pero las
+  // FECHAS son inventadas: ninguna de estas contrataciones está cerrada.
   dates: [
     {
       date: "2026-09-19",
-      venue: "Sala Vértigo",
-      city: "Valencia",
+      venue: "Sala Taboo",
+      city: "Madrid",
       country: "ES",
       ticketsUrl: "https://example.com/entradas",
       note: "Peak time",
     },
     {
       date: "2026-10-03",
-      venue: "Festival Marea Sonora",
-      city: "Alicante",
+      venue: "Café La Palma",
+      city: "Madrid",
       country: "ES",
       ticketsUrl: "https://example.com/entradas",
-      note: "Escenario principal",
+      note: "Set club",
     },
     {
       date: "2026-10-24",
-      venue: "Hangar Siete",
+      venue: "Mondo Disko",
       city: "Madrid",
       country: "ES",
       ticketsUrl: "https://example.com/entradas",
@@ -97,14 +99,21 @@ export const site = {
     },
     {
       date: "2026-11-14",
-      venue: "Sala Aurora",
-      city: "Bilbao",
+      venue: "Samsara",
+      city: "Madrid",
       country: "ES",
       note: "All night long",
     },
     {
+      date: "2026-11-28",
+      venue: "Keeper",
+      city: "Madrid",
+      country: "ES",
+      ticketsUrl: "https://example.com/entradas",
+    },
+    {
       date: "2026-12-31",
-      venue: "Kilómetro Cero",
+      venue: "Joy Eslava",
       city: "Madrid",
       country: "ES",
       ticketsUrl: "https://example.com/entradas",
