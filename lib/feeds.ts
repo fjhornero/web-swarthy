@@ -24,6 +24,8 @@ export interface TrackItem {
   title: string;
   url: string;
   publishedAt: string;
+  /** Carátula del track; ausente si el item del RSS no trae itunes:image */
+  artwork?: string;
 }
 
 export async function getLatestYouTubeVideos(): Promise<VideoItem[]> {
@@ -88,6 +90,7 @@ export async function getLatestSoundCloudTracks(): Promise<TrackItem[]> {
       const linkMatch = item.match(/<link>([\s\S]*?)<\/link>/);
       const guidMatch = item.match(/<guid[^>]*>([^<]+)<\/guid>/);
       const dateMatch = item.match(/<pubDate>([^<]+)<\/pubDate>/);
+      const artworkMatch = item.match(/<itunes:image[^>]+href="([^"]+)"/);
 
       if (!titleMatch) continue;
 
@@ -99,6 +102,7 @@ export async function getLatestSoundCloudTracks(): Promise<TrackItem[]> {
         title: titleMatch[1].trim(),
         url: linkMatch?.[1]?.trim() ?? "",
         publishedAt: dateMatch?.[1]?.trim() ?? "",
+        artwork: artworkMatch?.[1],
       });
     }
 

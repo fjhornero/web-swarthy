@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Send, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 import { submitContact, type ContactFields } from "@/app/actions/contact";
+import { ConsentCheckbox } from "@/components/ConsentCheckbox";
 
 const inputClass =
   "w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-text-primary placeholder:text-text-secondary/50 outline-none transition focus:border-accent-red focus:bg-white/8 focus:ring-1 focus:ring-accent-red/40";
@@ -21,6 +22,7 @@ export function Contact() {
       nombre: fd.get("nombre") as string,
       email: fd.get("email") as string,
       mensaje: fd.get("mensaje") as string,
+      consentimiento: fd.get("consentimiento") === "on",
       web: fd.get("web") as string,
     };
 
@@ -146,6 +148,8 @@ export function Contact() {
                   />
                 </div>
               </div>
+
+              <ConsentCheckbox id="contact-consent" />
 
               <AnimatePresence>
                 {result?.error && (

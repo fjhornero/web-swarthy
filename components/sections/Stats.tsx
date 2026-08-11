@@ -18,19 +18,20 @@ export function Stats() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-40px" }}
               transition={{ duration: 0.5, delay: i * 0.08 }}
-              className={`flex flex-col items-center gap-1 px-4 py-8 text-center md:py-10 ${
+              className={`flex flex-col-reverse items-center gap-1 px-4 py-8 text-center md:py-10 ${
                 i % 2 === 0 ? "border-r border-border-dark" : ""
               } md:[&:not(:last-child)]:border-r ${
                 i < 2 ? "border-b border-border-dark md:border-b-0" : ""
               }`}
             >
-              <dt className="sr-only">{s.label}</dt>
-              <dd className="font-display text-4xl uppercase leading-none text-gradient md:text-5xl">
+              {/* Dentro de un <dl> cada div sólo admite pares dt→dd; el orden
+                  visual (valor arriba, etiqueta abajo) lo da flex-col-reverse. */}
+              <dt className="text-xs uppercase tracking-[0.15em] text-text-secondary md:text-sm">
+                {s.label}
+              </dt>
+              <dd className="m-0 font-display text-4xl uppercase leading-none text-gradient md:text-5xl">
                 {s.value}
               </dd>
-              <span className="text-xs uppercase tracking-[0.15em] text-text-secondary md:text-sm">
-                {s.label}
-              </span>
             </motion.div>
           ))}
         </dl>

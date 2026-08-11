@@ -32,15 +32,12 @@ export function Hero() {
           {site.hero.overline}
         </motion.div>
 
-        {/* headline */}
-        <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="font-display text-5xl uppercase leading-[0.95] tracking-tight md:text-7xl lg:text-8xl"
-        >
+        {/* headline — sin animación de opacidad a propósito: es el elemento LCP
+            y arrancar en opacity:0 retrasaba su pintado ~1s, hasta que hidrataba
+            Framer Motion. */}
+        <h1 className="font-display text-5xl uppercase leading-[0.95] tracking-tight md:text-7xl lg:text-8xl">
           MUSIC IS THE <span className="text-gradient">ANSWER</span>
-        </motion.h1>
+        </h1>
 
         {/* sub */}
         <motion.p

@@ -1,10 +1,41 @@
 // JSON-LD estructurado usado por app/layout.tsx.
 
 import { site } from "./data";
+import { upcomingDates } from "./dates";
 
 export const SITE_URL = "https://djswarthy.es";
 export const SITE_NAME = "DJ Swarthy";
 export const OG_IMAGE = "/images/og.jpg";
+
+// Un nodo Event por fecha confirmada. Sin fechas no se emite ninguno: un
+// MusicEvent vacío o caducado es peor que no declararlo.
+const eventNodes = upcomingDates().map((gig) => ({
+  "@type": "MusicEvent",
+  name: `DJ Swarthy en ${gig.venue}`,
+  startDate: gig.date,
+  eventStatus: "https://schema.org/EventScheduled",
+  eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
+  performer: { "@id": `${SITE_URL}#artist` },
+  location: {
+    "@type": "Place",
+    name: gig.venue,
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: gig.city,
+      addressCountry: gig.country,
+    },
+  },
+  ...(gig.ticketsUrl && {
+    offers: {
+      "@type": "Offer",
+      url: gig.ticketsUrl,
+      availability:
+        gig.status === "agotada"
+          ? "https://schema.org/SoldOut"
+          : "https://schema.org/InStock",
+    },
+  }),
+}));
 
 export const jsonLd = {
   "@context": "https://schema.org",
@@ -58,6 +89,7 @@ export const jsonLd = {
         acceptedAnswer: { "@type": "Answer", text: a },
       })),
     },
+    ...eventNodes,
   ],
 };
 
