@@ -61,13 +61,82 @@ export const site = {
     body: "Todo empezó en las fiestas del pueblo, con un maletín de vinilos, ganas de hacerlo bien y la certeza de que la música podía cambiar el ambiente de una plaza en cuestión de minutos. Ahí nació Swarthy.\n\nDiecinueve años después, ese instinto sigue intacto. Su corazón late al ritmo del progressive y el trance — esa música que construye paisajes, que sube despacio y te lleva lejos — pero su versatilidad es su sello: de un remember ochentero a un tech house de madrugada, pasando por house melódico o nu disco, ningún estilo le es ajeno y ninguno te dejará indiferente.\n\nUn DJ que no pincha para él, sino para quien llena la sala.",
   },
 
-  // Próximas fechas. Vacío = la sección se oculta por completo y no se emite
-  // el JSON-LD de eventos. Las fechas pasadas se filtran solas (ver Dates.tsx).
-  dates: [] as GigDate[],
+  // ⚠️ DATOS DE DEMO — NO PUBLICAR ⚠️
+  // Las fechas y los testimonios de abajo son inventados, sólo sirven para ver
+  // cómo quedan las secciones con contenido. Antes de desplegar hay que
+  // sustituirlos por datos reales o vaciar los arrays (con `[]` las dos
+  // secciones se ocultan y no se emite el JSON-LD de eventos).
+  // Las salas y las personas son ficticias a propósito: no se atribuye ninguna
+  // cita ni ninguna contratación a un negocio que existe de verdad.
 
-  // Testimonios de promotores. Vacío = la sección no se renderiza.
-  // No rellenar con texto inventado: es prueba social, tiene que ser real.
-  testimonials: [] as Testimonial[],
+  // Próximas fechas. Las pasadas se filtran solas (ver lib/dates.ts).
+  // Salas reales del circuito de Swarthy (las mismas de `venues`), pero las
+  // FECHAS son inventadas: ninguna de estas contrataciones está cerrada.
+  dates: [
+    {
+      date: "2026-09-19",
+      venue: "Sala Taboo",
+      city: "Madrid",
+      country: "ES",
+      note: "Peak time",
+    },
+    {
+      date: "2026-10-03",
+      venue: "Café La Palma",
+      city: "Madrid",
+      country: "ES",
+      note: "Set club",
+    },
+    {
+      date: "2026-10-24",
+      venue: "Mondo Disko",
+      city: "Madrid",
+      country: "ES",
+      status: "agotada",
+    },
+    {
+      date: "2026-11-14",
+      venue: "Samsara",
+      city: "Madrid",
+      country: "ES",
+      note: "All night long",
+    },
+    {
+      date: "2026-11-28",
+      venue: "Keeper",
+      city: "Madrid",
+      country: "ES",
+    },
+    {
+      date: "2026-12-31",
+      venue: "Joy Eslava",
+      city: "Madrid",
+      country: "ES",
+      note: "Especial Nochevieja",
+    },
+  ] as GigDate[],
+
+  // Testimonios de promotores.
+  testimonials: [
+    {
+      quote:
+        "Le dimos dos horas de peak time y acabó cerrando la noche entera. Leyó la pista desde el primer tema y no la soltó. Repetimos en cuanto cuadre agenda.",
+      author: "Marta Ibáñez",
+      role: "Programación · Sala Vértigo",
+    },
+    {
+      quote:
+        "Puntual, con el rider claro y sin una sola incidencia técnica. Para un festival eso vale tanto como el set, y el set fue de los mejores del día.",
+      author: "Rubén Castaño",
+      role: "Promotor · Festival Marea Sonora",
+    },
+    {
+      quote:
+        "Le pedimos algo que funcionase con público muy mezclado y lo resolvió sin bajar el nivel en ningún momento. Se nota la mano de quien lleva años en cabina.",
+      author: "David Peña",
+      role: "Dirección de sala · Hangar Siete",
+    },
+  ] as Testimonial[],
 
   // Comparativa de formatos de set
   formats: [
