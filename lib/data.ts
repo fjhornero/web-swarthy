@@ -35,6 +35,10 @@ export const site = {
   tagline: "DJ · PRODUCTOR · TODO TERRENO",
   bookingEmail: "djswarthy@gmail.com",
 
+  // ID de artista en Spotify. Lo usan lib/spotify.ts (API/oEmbed) y la
+  // sección de lanzamientos para construir los reproductores incrustados.
+  spotifyArtistId: "3Ua2pcw8yGQ4bD2Ouf7d4b",
+
   // Número en formato internacional sin signos ni espacios (ej. "34600123456").
   // Vacío = no se muestra ningún CTA de WhatsApp en la web.
   whatsapp: "",
@@ -240,6 +244,7 @@ export const site = {
   ],
 
   socials: [
+    { label: "Spotify", url: "https://open.spotify.com/artist/3Ua2pcw8yGQ4bD2Ouf7d4b" },
     { label: "SoundCloud", url: "https://soundcloud.com/dj_swarthy" },
     { label: "YouTube", url: "https://www.youtube.com/@swarthy_dj" },
     { label: "Facebook", url: "https://www.facebook.com/profile.php?id=100063486909762" },

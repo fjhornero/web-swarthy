@@ -16,7 +16,7 @@ const csp = [
   `img-src 'self' data:`,
   `font-src 'self'`,
   `connect-src 'self' https://plausible.io`,
-  `frame-src https://www.youtube-nocookie.com https://w.soundcloud.com`,
+  `frame-src https://www.youtube-nocookie.com https://w.soundcloud.com https://open.spotify.com`,
   `object-src 'none'`,
   `base-uri 'self'`,
   `form-action 'self'`,
@@ -34,13 +34,17 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   output: "standalone",
-  // Miniaturas de los feeds de YouTube y SoundCloud. Se sirven optimizadas
+  // Miniaturas de los feeds de YouTube, SoundCloud y Spotify. Se sirven optimizadas
   // desde /_next/image (mismo origen), así que no hace falta abrir img-src.
   images: {
     remotePatterns: [
       // YouTube reparte las miniaturas entre i.ytimg.com e i1/i2/i3/i4.ytimg.com
       { protocol: "https", hostname: "*.ytimg.com" },
       { protocol: "https", hostname: "*.sndcdn.com" },
+      // Carátulas de Spotify (i.scdn.co) y foto de artista del oEmbed
+      // (image-cdn-ak.spotifycdn.com y sus variantes por región)
+      { protocol: "https", hostname: "*.scdn.co" },
+      { protocol: "https", hostname: "*.spotifycdn.com" },
     ],
   },
   async headers() {

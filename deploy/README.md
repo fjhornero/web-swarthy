@@ -115,7 +115,9 @@ ssh root@212.227.41.45
 cd /opt/web-swarthy
 git remote -v                 # debe apuntar a github.com/fjhornero/web-swarthy
 git checkout main
-ls -la .env.local             # TELEGRAM_BOT_TOKEN y TELEGRAM_CHAT_ID
+ls -la .env.local             # TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID y,
+                              # opcionalmente, SPOTIFY_CLIENT_ID/SECRET
+                              # (plantilla en .env.example)
 which curl || apt-get install -y curl
 ```
 
