@@ -1,8 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { AudioLines, ExternalLink } from "lucide-react";
+import { AudioLines, ExternalLink, Play } from "lucide-react";
 import { MediaFacade } from "@/components/MediaFacade";
 import { site } from "@/lib/data";
 import type { SpotifyArtistCard, SpotifyRelease } from "@/lib/spotify";
@@ -95,26 +97,15 @@ export function Releases({ releases, artist }: ReleasesProps) {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-50px" }}
             transition={{ duration: 0.6 }}
-            className="mx-auto max-w-2xl overflow-hidden rounded-2xl border border-border-dark bg-dark-secondary"
+            className="mx-auto max-w-3xl overflow-hidden rounded-2xl border border-border-dark bg-dark-secondary"
           >
             <div className="flex items-center gap-2 border-b border-border-dark px-5 py-4">
               <AudioLines size={18} className="text-accent-orange" />
               <span className="text-xs uppercase tracking-[0.2em] text-text-secondary">
-                {artist?.name ?? "Spotify"}
+                Reproductor oficial
               </span>
             </div>
-            <MediaFacade
-              thumbnail={artist?.image}
-              title={artist?.name ?? "DJ Swarthy en Spotify"}
-              ratio="square"
-              sizes="(max-width: 768px) 100vw, 640px"
-            >
-              <SpotifyEmbed
-                src={`https://open.spotify.com/embed/artist/${site.spotifyArtistId}?theme=0`}
-                title={`${artist?.name ?? "DJ Swarthy"} en Spotify`}
-                height={420}
-              />
-            </MediaFacade>
+            <ProfilePlayer artist={artist} />
           </motion.div>
         )}
 
@@ -130,6 +121,59 @@ export function Releases({ releases, artist }: ReleasesProps) {
         </div>
       </div>
     </section>
+  );
+}
+
+/**
+ * Tarjeta del perfil: foto a su resolución real (el oEmbed sólo da 320px, y
+ * ampliarla a todo el ancho la dejaba borrosa) y un botón que monta el
+ * reproductor. Mismo trato que MediaFacade —el iframe no existe hasta el
+ * clic— pero con presentación horizontal en vez de portada gigante.
+ */
+function ProfilePlayer({ artist }: { artist: SpotifyArtistCard | null }) {
+  const [playing, setPlaying] = useState(false);
+  const name = artist?.name ?? "DJ Swarthy";
+
+  if (playing) {
+    // El embed pinta su propio fondo redondeado: sin este colchón sus esquinas
+    // chocan con el borde de la tarjeta.
+    return (
+      <div className="p-4 sm:p-5">
+        <SpotifyEmbed
+          src={`https://open.spotify.com/embed/artist/${site.spotifyArtistId}?theme=0`}
+          title={`${name} en Spotify`}
+          height={420}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col items-center gap-6 p-6 sm:flex-row sm:gap-8 sm:p-8">
+      {artist?.image && (
+        <Image
+          src={artist.image}
+          alt=""
+          width={160}
+          height={160}
+          className="h-40 w-40 shrink-0 rounded-xl object-cover"
+        />
+      )}
+      <div className="text-center sm:text-left">
+        <h3 className="font-display text-3xl uppercase md:text-4xl">{name}</h3>
+        <p className="mt-2 text-sm text-text-secondary">
+          Sus temas publicados, en el reproductor oficial de Spotify.
+        </p>
+        <button
+          type="button"
+          onClick={() => setPlaying(true)}
+          className="mt-5 inline-flex items-center gap-2 rounded-full gradient-primary px-6 py-3 text-sm font-semibold shadow-glow transition-transform hover:scale-105"
+        >
+          <Play size={16} className="fill-white text-white" />
+          Escuchar ahora
+        </button>
+      </div>
+    </div>
   );
 }
 
