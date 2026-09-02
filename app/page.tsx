@@ -6,6 +6,7 @@ import { Stats } from "@/components/sections/Stats";
 import { About } from "@/components/sections/About";
 import { Dates } from "@/components/sections/Dates";
 import { Mixes } from "@/components/sections/Mixes";
+import { Releases } from "@/components/sections/Releases";
 import { Formats } from "@/components/sections/Formats";
 import { Venues } from "@/components/sections/Venues";
 import { Testimonials } from "@/components/sections/Testimonials";
@@ -14,12 +15,15 @@ import { Faq } from "@/components/sections/Faq";
 import { Contact } from "@/components/sections/Contact";
 import { FinalCta } from "@/components/sections/FinalCta";
 import { getLatestYouTubeVideos, getLatestSoundCloudTracks } from "@/lib/feeds";
+import { getSpotifyReleases, getSpotifyArtistCard } from "@/lib/spotify";
 import { upcomingDates } from "@/lib/dates";
 
 export default async function Home() {
-  const [ytVideos, scTracks] = await Promise.all([
+  const [ytVideos, scTracks, spotifyReleases, spotifyArtist] = await Promise.all([
     getLatestYouTubeVideos(),
     getLatestSoundCloudTracks(),
+    getSpotifyReleases(),
+    getSpotifyArtistCard(),
   ]);
 
   // El filtrado por fecha se hace aquí (servidor) y no dentro del componente
@@ -36,6 +40,7 @@ export default async function Home() {
         <About />
         <Dates dates={dates} />
         <Mixes videos={ytVideos} tracks={scTracks} />
+        <Releases releases={spotifyReleases} artist={spotifyArtist} />
         <Formats />
         <Venues />
         <Testimonials />

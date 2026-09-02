@@ -8,6 +8,7 @@ import { Menu, X } from "lucide-react";
 const links = [
   { href: "#about", label: "Sobre Swarthy" },
   { href: "#mixes", label: "Sets" },
+  { href: "#spotify", label: "Música" },
   { href: "#formats", label: "Formatos" },
   { href: "#venues", label: "Clubs" },
   { href: "#faq", label: "FAQ" },

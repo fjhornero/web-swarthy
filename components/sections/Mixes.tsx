@@ -1,10 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
-import { useState } from "react";
 import { motion } from "framer-motion";
-import { Youtube, Music, ExternalLink, Play } from "lucide-react";
+import { Youtube, Music, ExternalLink } from "lucide-react";
+import { MediaFacade } from "@/components/MediaFacade";
 import type { VideoItem, TrackItem } from "@/lib/feeds";
 
 interface MixesProps {
@@ -201,59 +200,9 @@ function MediaMeta({
   );
 }
 
-/**
- * Portada clicable que sólo monta el iframe tras el clic. Evita cargar los
- * reproductores de YouTube/SoundCloud —y sus cookies de terceros— en visitas
- * donde nadie le da al play.
- */
-function Facade({
-  thumbnail,
-  title,
-  compact,
-  children,
-}: {
-  thumbnail?: string;
-  title: string;
-  compact?: boolean;
-  children: React.ReactNode;
-}) {
-  const [playing, setPlaying] = useState(false);
-
-  if (playing) return <>{children}</>;
-
-  return (
-    <button
-      type="button"
-      onClick={() => setPlaying(true)}
-      aria-label={`Reproducir ${title}`}
-      className="group relative block aspect-video w-full overflow-hidden"
-    >
-      {thumbnail ? (
-        <Image
-          src={thumbnail}
-          alt=""
-          fill
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
-          sizes={compact ? "(max-width: 640px) 100vw, 33vw" : "(max-width: 768px) 100vw, 50vw"}
-        />
-      ) : (
-        <div className="absolute inset-0 bg-dark-secondary" />
-      )}
-      <div className="absolute inset-0 bg-black/30 transition-colors group-hover:bg-black/15" />
-      <span
-        className={`absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full gradient-primary shadow-glow-strong transition-transform group-hover:scale-110 ${
-          compact ? "h-12 w-12" : "h-16 w-16"
-        }`}
-      >
-        <Play size={compact ? 18 : 24} className="ml-0.5 fill-white text-white" />
-      </span>
-    </button>
-  );
-}
-
 function YouTubeFacade({ video, compact }: { video: VideoItem; compact?: boolean }) {
   return (
-    <Facade thumbnail={video.thumbnail} title={video.title} compact={compact}>
+    <MediaFacade thumbnail={video.thumbnail} title={video.title} compact={compact}>
       <div className="relative aspect-video w-full">
         <iframe
           src={`https://www.youtube-nocookie.com/embed/${video.id}?rel=0&autoplay=1`}
@@ -264,13 +213,13 @@ function YouTubeFacade({ video, compact }: { video: VideoItem; compact?: boolean
           className="absolute inset-0 h-full w-full"
         />
       </div>
-    </Facade>
+    </MediaFacade>
   );
 }
 
 function SoundCloudFacade({ track, compact }: { track: TrackItem; compact?: boolean }) {
   return (
-    <Facade thumbnail={track.artwork} title={track.title} compact={compact}>
+    <MediaFacade thumbnail={track.artwork} title={track.title} compact={compact}>
       <iframe
         scrolling="no"
         allow="autoplay"
@@ -279,7 +228,7 @@ function SoundCloudFacade({ track, compact }: { track: TrackItem; compact?: bool
         style={{ height: compact ? 180 : 300 }}
         title={track.title}
       />
-    </Facade>
+    </MediaFacade>
   );
 }
 
