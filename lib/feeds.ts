@@ -1,4 +1,5 @@
 const YT_CHANNEL_ID = "UCssrEHx7wZR0jvlABi46TNQ";
+const YT_HANDLE = "swarthy_dj";
 const SC_USER_ID = "1764128";
 
 // YouTube limita (429/403) las peticiones de RSS desde IPs de datacenter
@@ -15,7 +16,13 @@ export interface VideoItem {
   title: string;
   url: string;
   thumbnail: string;
+  /** ISO 8601 cuando viene del RSS; vacío cuando se raspa la página del canal. */
   publishedAt: string;
+  /**
+   * Antigüedad relativa tal y como la muestra YouTube ("hace 9 días"). Sólo la
+   * trae el raspado de la página del canal, que no expone la fecha exacta.
+   */
+  publishedLabel?: string;
   isShort: boolean;
 }
 
@@ -28,7 +35,18 @@ export interface TrackItem {
   artwork?: string;
 }
 
+/**
+ * YouTube retiró los feeds RSS públicos: `/feeds/videos.xml` responde 404 para
+ * cualquier canal. Se mantiene como fuente primaria por si vuelve a estar
+ * disponible, pero el camino real es ahora el raspado de la página del canal.
+ */
 export async function getLatestYouTubeVideos(): Promise<VideoItem[]> {
+  const fromRss = await getYouTubeVideosFromRss();
+  if (fromRss.length > 0) return fromRss;
+  return getYouTubeVideosFromChannelPage();
+}
+
+async function getYouTubeVideosFromRss(): Promise<VideoItem[]> {
   try {
     const res = await fetch(
       `https://www.youtube.com/feeds/videos.xml?channel_id=${YT_CHANNEL_ID}`,
@@ -69,6 +87,109 @@ export async function getLatestYouTubeVideos(): Promise<VideoItem[]> {
   } catch {
     return [];
   }
+}
+
+/**
+ * Fuente de respaldo: la página `/@handle/videos` embebe un JSON (`ytInitialData`)
+ * con la rejilla de vídeos ya ordenada de más reciente a más antiguo. Se recorre
+ * el árbol buscando nodos `lockupViewModel` en lugar de navegar por la ruta
+ * exacta de pestañas, porque YouTube reorganiza esa jerarquía con frecuencia.
+ */
+async function getYouTubeVideosFromChannelPage(): Promise<VideoItem[]> {
+  try {
+    const res = await fetch(`https://www.youtube.com/@${YT_HANDLE}/videos?hl=es&gl=ES`, {
+      headers: {
+        ...FEED_HEADERS,
+        Accept: "text/html,application/xhtml+xml",
+        "Accept-Language": "es-ES,es;q=0.9",
+        // Evita el muro de consentimiento que YouTube sirve a las IPs europeas
+        // sin cookies, que devolvería un HTML sin ytInitialData.
+        Cookie: "SOCS=CAI; CONSENT=YES+cb",
+      },
+      next: { revalidate: 3600 },
+    });
+    if (!res.ok) return [];
+
+    const html = await res.text();
+    const match = html.match(/var ytInitialData = (\{[\s\S]*?\});<\/script>/);
+    if (!match) return [];
+
+    const videos: VideoItem[] = [];
+    const seen = new Set<string>();
+
+    for (const lockup of collectLockups(JSON.parse(match[1]))) {
+      const id = lockup.contentId;
+      if (!id || seen.has(id)) continue;
+      seen.add(id);
+
+      const meta = lockup.metadata?.lockupMetadataViewModel;
+      const rows = meta?.metadata?.contentMetadataViewModel?.metadataRows ?? [];
+      // La fila de metadatos es "N visualizaciones • hace X"; la antigüedad es
+      // el único fragmento que trae accessibilityLabel.
+      const age = rows
+        .flatMap((row) => row.metadataParts ?? [])
+        .find((part) => part.text?.accessibilityLabel ?? part.accessibilityLabel)?.text?.content;
+
+      videos.push({
+        id,
+        title: meta?.title?.content ?? "",
+        url: `https://www.youtube.com/watch?v=${id}`,
+        // Las miniaturas del JSON llevan parámetros firmados que caducan; la
+        // ruta sin firmar es estable y sirve el mismo 16:9 de 720p.
+        thumbnail: `https://i.ytimg.com/vi/${id}/hq720.jpg`,
+        publishedAt: "",
+        publishedLabel: age,
+        // La pestaña /videos no incluye shorts: tienen su propia pestaña.
+        isShort: false,
+      });
+    }
+
+    return videos;
+  } catch {
+    return [];
+  }
+}
+
+interface LockupViewModel {
+  contentId?: string;
+  contentType?: string;
+  metadata?: {
+    lockupMetadataViewModel?: {
+      title?: { content?: string };
+      metadata?: {
+        contentMetadataViewModel?: {
+          metadataRows?: Array<{
+            metadataParts?: Array<{
+              text?: { content?: string; accessibilityLabel?: string };
+              accessibilityLabel?: string;
+            }>;
+          }>;
+        };
+      };
+    };
+  };
+}
+
+/** Recorre el JSON en profundidad y devuelve los lockups de vídeo en orden. */
+function collectLockups(node: unknown): LockupViewModel[] {
+  const found: LockupViewModel[] = [];
+
+  const walk = (value: unknown) => {
+    if (Array.isArray(value)) {
+      value.forEach(walk);
+      return;
+    }
+    if (value === null || typeof value !== "object") return;
+
+    const record = value as Record<string, unknown>;
+    const lockup = record.lockupViewModel as LockupViewModel | undefined;
+    if (lockup?.contentType === "LOCKUP_CONTENT_TYPE_VIDEO") found.push(lockup);
+
+    Object.values(record).forEach(walk);
+  };
+
+  walk(node);
+  return found;
 }
 
 export async function getLatestSoundCloudTracks(): Promise<TrackItem[]> {

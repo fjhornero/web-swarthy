@@ -16,17 +16,19 @@ const SECONDARY_LIMIT = 6;
 
 // Las fechas llegan en formatos distintos (YouTube en ISO 8601, SoundCloud en
 // RFC 2822), pero ambos los parsea Date. Las normalizamos a español para que
-// las dos tarjetas muestren el mismo estilo.
+// las dos tarjetas muestren el mismo estilo. Cuando YouTube se raspa de la
+// página del canal no hay fecha exacta, sólo la antigüedad relativa, así que
+// las tarjetas caen a esa etiqueta en lugar de quedarse sin dato.
 const dateFormatter = new Intl.DateTimeFormat("es-ES", {
   day: "numeric",
   month: "long",
   year: "numeric",
 });
 
-function formatDate(raw: string): string {
-  if (!raw) return "";
+function formatDate(raw: string, fallbackLabel?: string): string {
+  if (!raw) return fallbackLabel ?? "";
   const d = new Date(raw);
-  return isNaN(d.getTime()) ? "" : dateFormatter.format(d);
+  return isNaN(d.getTime()) ? fallbackLabel ?? "" : dateFormatter.format(d);
 }
 
 export function Mixes({ videos, tracks }: MixesProps) {
@@ -67,6 +69,7 @@ export function Mixes({ videos, tracks }: MixesProps) {
                 <MediaMeta
                   title={featuredVideo.title}
                   date={featuredVideo.publishedAt}
+                  dateLabel={featuredVideo.publishedLabel}
                   href={featuredVideo.url}
                   linkLabel="Ver en YouTube"
                 />
@@ -128,7 +131,10 @@ export function Mixes({ videos, tracks }: MixesProps) {
                       {entry.item.title}
                     </p>
                     <span className="mt-2 block text-xs text-text-secondary">
-                      {formatDate(entry.item.publishedAt)}
+                      {formatDate(
+                        entry.item.publishedAt,
+                        entry.kind === "video" ? entry.item.publishedLabel : undefined
+                      )}
                     </span>
                   </div>
                 </motion.div>
@@ -174,11 +180,13 @@ function PlatformCard({
 function MediaMeta({
   title,
   date,
+  dateLabel,
   href,
   linkLabel,
 }: {
   title: string;
   date: string;
+  dateLabel?: string;
   href: string;
   linkLabel: string;
 }) {
@@ -186,7 +194,9 @@ function MediaMeta({
     <div className="p-5">
       <p className="line-clamp-2 text-sm font-semibold leading-snug">{title}</p>
       <div className="mt-3 flex items-center justify-between">
-        <span className="text-xs text-text-secondary">{formatDate(date)}</span>
+        <span className="text-xs text-text-secondary">
+          {formatDate(date, dateLabel)}
+        </span>
         <Link
           href={href}
           target="_blank"
