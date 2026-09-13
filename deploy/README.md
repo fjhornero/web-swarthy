@@ -1,8 +1,8 @@
-# Despliegue en 212.227.41.45
+# Despliegue en 143.47.52.87
 
 ## Prerequisitos en el servidor
 
-1. DNS: `djswarthy.es` y `www.djswarthy.es` con A-record apuntando a `212.227.41.45`.
+1. DNS: `djswarthy.es` y `www.djswarthy.es` con A-record apuntando a `143.47.52.87`.
 2. Tener nginx + certbot ya corriendo (mismo patrón que n8n).
 3. Conocer el nombre de la red Docker que usa nginx para hablar con upstreams:
    ```
@@ -17,7 +17,7 @@
 git push origin task/create-web-djswarthy   # (o la rama que corresponda)
 
 # en el servidor
-ssh root@212.227.41.45
+ssh root@143.47.52.87
 cd /opt/   # o donde tengas los compose; ej: /srv/sites/
 git clone <url> web-swarthy
 cd web-swarthy
@@ -64,7 +64,7 @@ sudo nginx -s reload
 Cada push a `main` dispara `.github/workflows/deploy.yml`: primero corre el CI
 (lint + tipos + build) y, solo si pasa, entra por SSH a este servidor y hace el
 build de la imagen **aqui mismo**. No hay registry: la imagen se construye y se
-queda en `212.227.41.45`.
+queda en `143.47.52.87`.
 
 Secuencia exacta en el servidor:
 
@@ -83,11 +83,11 @@ En `Settings -> Secrets and variables -> Actions -> New repository secret`:
 
 | Secret | Valor |
 | --- | --- |
-| `DEPLOY_HOST` | `212.227.41.45` |
+| `DEPLOY_HOST` | `143.47.52.87` |
 | `DEPLOY_USER` | `root` (mejor un usuario `deploy` en el grupo `docker`) |
 | `DEPLOY_PATH` | ruta del clone en el servidor, p.ej. `/opt/web-swarthy` |
 | `DEPLOY_SSH_KEY` | clave **privada** ed25519 sin passphrase, entera con cabecera y pie |
-| `DEPLOY_SSH_KNOWN_HOSTS` | salida de `ssh-keyscan -H 212.227.41.45` |
+| `DEPLOY_SSH_KNOWN_HOSTS` | salida de `ssh-keyscan -H 143.47.52.87` |
 | `DEPLOY_PORT` | opcional, solo si SSH no escucha en el 22 |
 
 Y opcionalmente, en la pestana *Variables*, `HEALTH_URL` si cambias el puerto
@@ -101,17 +101,17 @@ En tu maquina (no reutilices tu clave personal):
 ssh-keygen -t ed25519 -C "github-actions-web-swarthy" -f ~/.ssh/web_swarthy_deploy -N ""
 
 # autorizarla en el servidor
-ssh-copy-id -i ~/.ssh/web_swarthy_deploy.pub root@212.227.41.45
+ssh-copy-id -i ~/.ssh/web_swarthy_deploy.pub root@143.47.52.87
 
 # el contenido de estos dos comandos es lo que pegas en los secrets
 cat ~/.ssh/web_swarthy_deploy        # -> DEPLOY_SSH_KEY
-ssh-keyscan -H 212.227.41.45         # -> DEPLOY_SSH_KNOWN_HOSTS
+ssh-keyscan -H 143.47.52.87         # -> DEPLOY_SSH_KNOWN_HOSTS
 ```
 
 ### Requisitos en el servidor antes del primer push
 
 ```bash
-ssh root@212.227.41.45
+ssh root@143.47.52.87
 cd /opt/web-swarthy
 git remote -v                 # debe apuntar a github.com/fjhornero/web-swarthy
 git checkout main
@@ -131,7 +131,7 @@ Actions -> Deploy -> *Run workflow*. Util para redesplegar sin commit nuevo.
 ## Actualizaciones manuales
 
 ```bash
-ssh root@212.227.41.45
+ssh root@143.47.52.87
 cd /opt/web-swarthy   # o donde lo hayas clonado
 git pull
 docker compose build
