@@ -49,7 +49,7 @@ Single long-scroll landing page modeled after the **DJSwarthy Academy** referenc
 
 ## Deployment
 
-Target server: `ssh root@212.227.41.45` (existing nginx + certbot + n8n stack). **nginx runs on the host, not in Docker** — the compose publishes the container only on the loopback (`127.0.0.1:3001 -> 3000`) and nginx `proxy_pass`es to it. The image is built and stored on that same server; there is no registry.
+Target server: `ssh root@143.47.52.87` (existing nginx + certbot + n8n stack). **nginx runs on the host, not in Docker** — the compose publishes the container only on the loopback (`127.0.0.1:3001 -> 3000`) and nginx `proxy_pass`es to it. The image is built and stored on that same server; there is no registry.
 
 - `Dockerfile` — multi-stage (deps → builder → runner). `node:20-alpine`, runs as non-root, executes `node server.js` from the `standalone` output.
 - `docker-compose.yml` — single `web` service joined to external `proxy` network. Healthcheck against `localhost:3000`.
@@ -60,7 +60,7 @@ Target server: `ssh root@212.227.41.45` (existing nginx + certbot + n8n stack). 
 
 ## Domains
 
-`djswarthy.es` (canonical) and `www.djswarthy.es` (redirects to apex). Both A-records must point to `212.227.41.45` before certbot can issue the cert.
+`djswarthy.es` (canonical) and `www.djswarthy.es` (redirects to apex). Both A-records must point to `143.47.52.87` before certbot can issue the cert.
 
 ## Not yet wired
 
