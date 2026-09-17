@@ -52,7 +52,7 @@ Single long-scroll landing page modeled after the **DJSwarthy Academy** referenc
 Target server: `ssh root@212.227.41.45` (existing nginx + certbot + n8n stack). **nginx runs on the host, not in Docker** — the compose publishes the container only on the loopback (`127.0.0.1:3001 -> 3000`) and nginx `proxy_pass`es to it. The image is built and stored on that same server; there is no registry.
 
 - `Dockerfile` — multi-stage (deps → builder → runner). `node:20-alpine`, runs as non-root, executes `node server.js` from the `standalone` output.
-- `docker-compose.yml` — single `web` service joined to external `proxy` network. Healthcheck against `localhost:3000`.
+- `docker-compose.yml` — single `web` service, no custom networks: it publishes `127.0.0.1:3001 -> 3000` so the host's nginx can reach it over the loopback. Healthcheck against `localhost:3000` inside the container.
 - `deploy/nginx-djswarthy.conf` — sample vhost: HTTP→HTTPS redirect, www → apex canonicalization, `proxy_pass` to the published loopback port.
 - `deploy/README.md` — first-deploy and update walkthrough, plus the GitHub secrets the pipeline needs.
 - `.github/workflows/ci.yml` — lint + `tsc --noEmit` + `next build` on every PR and non-main push. Also exposed as `workflow_call`.
