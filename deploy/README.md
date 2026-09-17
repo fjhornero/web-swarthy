@@ -4,11 +4,13 @@
 
 1. DNS: `djswarthy.es` y `www.djswarthy.es` con A-record apuntando a `143.47.52.87`.
 2. Tener nginx + certbot ya corriendo (mismo patrón que n8n).
-3. Conocer el nombre de la red Docker que usa nginx para hablar con upstreams:
+3. Tener libre el puerto `3001` en el loopback del host (`127.0.0.1`). Es el puerto
+   que publica el contenedor y al que nginx hace `proxy_pass`:
    ```
-   docker network ls
+   ss -ltnp | grep 127.0.0.1:3001
    ```
-   Si la red no es `nginx_default`, edita `docker-compose.yml` (campo `networks.proxy.name`).
+   Si ya está ocupado, cambia el mapeo en `docker-compose.yml` (`services.web.ports`)
+   y ajusta el `proxy_pass` de `deploy/nginx-djswarthy.conf` y la variable `HEALTH_URL`.
 
 ## Primer despliegue
 
@@ -27,17 +29,19 @@ docker compose build
 docker compose up -d
 ```
 
-El contenedor expone solo el puerto interno `3000` en la red Docker. No publica nada al host.
+El contenedor escucha en el puerto interno `3000` y lo publica **solo en el loopback del
+host** (`127.0.0.1:3001`). No queda expuesto al exterior: únicamente nginx, que corre en
+el propio host, puede alcanzarlo.
 
 ## Conectar nginx al contenedor
 
-Copia `deploy/nginx-djswarthy.conf` dentro de tu nginx existente (en el directorio de configs que ya estés usando). El upstream apunta a `http://web-swarthy:3000` — eso solo funciona si **el contenedor de nginx está en la misma red Docker** que `web-swarthy`. Verifica:
+Copia `deploy/nginx-djswarthy.conf` dentro de tu nginx existente (en el directorio de configs que ya estés usando). **nginx corre en el host, no en Docker**, así que el upstream apunta a `http://127.0.0.1:3001` — el puerto que publica el contenedor. Verifica que el servicio responde antes de recargar nginx:
 
 ```bash
-docker network inspect <nombre-red> | grep -A2 Containers
+curl -fsS http://127.0.0.1:3001/api/health
 ```
 
-Deberías ver tanto `nginx` como `web-swarthy` listados.
+Debería devolver la respuesta del healthcheck. Luego `nginx -t && systemctl reload nginx`.
 
 ## Emitir certificado con certbot
 
@@ -150,7 +154,11 @@ docker compose up -d --force-recreate
 docker compose logs -f web                 # logs en vivo
 docker compose ps                          # estado del servicio
 docker compose exec web sh                 # entrar al contenedor
-docker network inspect nginx_default       # ver qué containers comparten la red
+ss -ltnp | grep 127.0.0.1:3001             # comprobar que el puerto está publicado
+curl -fsS http://127.0.0.1:3001/api/health # probar el upstream sin pasar por nginx
 ```
 
-Si nginx devuelve 502: el contenedor `web-swarthy` no es alcanzable desde la red de nginx. Comprueba que ambos están en la misma red Docker.
+Si nginx devuelve 502: nginx no consigue hablar con `127.0.0.1:3001`. Por orden, comprueba
+que el contenedor está arriba (`docker compose ps`), que el puerto aparece publicado en el
+loopback (`ss -ltnp`), y que el `curl` directo responde. Si el `curl` va pero nginx no, el
+problema está en el `proxy_pass` del vhost, no en el contenedor.

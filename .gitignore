@@ -41,3 +41,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# grafo de conocimiento (graphify): dato derivado y regenerable con `graphify update .`
+# No se versiona: caduca en cuanto cambia el código y las etiquetas extraídas de
+# imágenes pueden arrastrar datos personales al texto plano.
+graphify-out/
