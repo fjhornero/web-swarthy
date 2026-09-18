@@ -135,7 +135,7 @@ ssh-keyscan 143.47.52.87 | gh secret set DEPLOY_SSH_KNOWN_HOSTS
 ```bash
 ssh ubuntu@143.47.52.87
 cd /opt/web-swarthy
-git remote -v                 # debe apuntar a github.com/fjhornero/web-swarthy
+git remote -v                 # debe ser HTTPS: https://github.com/fjhornero/web-swarthy.git
 git checkout main
 ls -la .env.local             # TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID y,
                               # opcionalmente, SPOTIFY_CLIENT_ID/SECRET
@@ -145,6 +145,18 @@ which curl || apt-get install -y curl
 
 `.env.local` esta en `.gitignore`, asi que `git reset --hard` no lo toca: se
 queda entre despliegues.
+
+**El remote tiene que ser HTTPS, no SSH.** El repo es público, así que por HTTPS se lee
+sin credenciales de ningún tipo. Con un remote `git@github.com:...` el usuario `ubuntu`
+necesitaría su propia clave privada y su propio `known_hosts` con github.com — y si le
+faltan, el despliegue revienta a mitad del script remoto con un `Host key verification
+failed` que parece del servidor pero en realidad es de github.com. Para corregirlo:
+
+```bash
+git -C /opt/web-swarthy remote set-url origin https://github.com/fjhornero/web-swarthy.git
+```
+
+El paso *Comprobar acceso al servidor* del workflow verifica esto antes de tocar nada.
 
 ### Lanzarlo a mano
 
