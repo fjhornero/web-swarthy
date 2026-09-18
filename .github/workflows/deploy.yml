@@ -56,6 +56,18 @@ jobs:
             exit 1
           fi
 
+          # El clone del servidor tiene que poder hablar con GitHub sin credenciales
+          # ni prompts. El repo es publico: el remote debe ser HTTPS. Con un remote
+          # SSH (git@github.com:...) el usuario de despliegue necesitaria su propia
+          # clave y su propio known_hosts, y el fallo aparece a mitad del script
+          # remoto como un "Host key verification failed" que parece del servidor.
+          if ! ssh -i ~/.ssh/id_deploy -p "$DEPLOY_PORT" -o BatchMode=yes -o ConnectTimeout=15 \
+               "$DEPLOY_USER@$DEPLOY_HOST" \
+               "cd '$DEPLOY_PATH' && GIT_TERMINAL_PROMPT=0 git ls-remote --exit-code origin HEAD" > /dev/null 2>&1; then
+            echo "::error::El clone de $DEPLOY_PATH no puede leer el remoto. Ponlo en HTTPS: git -C $DEPLOY_PATH remote set-url origin https://github.com/${{ github.repository }}.git"
+            exit 1
+          fi
+
       - name: Build y arranque en el servidor
         env:
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
