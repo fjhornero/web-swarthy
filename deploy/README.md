@@ -1,9 +1,15 @@
 # Despliegue en 143.47.52.87
 
+El acceso al servidor es con el usuario **`ubuntu`** (`ssh ubuntu@143.47.52.87`), que ya
+está en el grupo `docker`: ningún comando de este documento necesita `sudo`. No se entra
+como `root`. La máquina es **aarch64 (ARM)**, así que la imagen se construye nativamente
+en arm64 — otra razón para no construirla fuera del servidor.
+
 ## Prerequisitos en el servidor
 
 1. DNS: `djswarthy.es` y `www.djswarthy.es` con A-record apuntando a `143.47.52.87`.
-2. Tener nginx + certbot ya corriendo (mismo patrón que n8n).
+2. Tener nginx + certbot ya corriendo (mismo patrón que n8n). nginx es del host y los
+   vhosts viven en `/etc/nginx/sites-available/` (el de esta web es `djswarthy.es`).
 3. Tener libre el puerto `3001` en el loopback del host (`127.0.0.1`). Es el puerto
    que publica el contenedor y al que nginx hace `proxy_pass`:
    ```
@@ -19,8 +25,8 @@
 git push origin task/create-web-djswarthy   # (o la rama que corresponda)
 
 # en el servidor
-ssh root@143.47.52.87
-cd /opt/   # o donde tengas los compose; ej: /srv/sites/
+ssh ubuntu@143.47.52.87
+cd /opt/   # es donde viven el resto de stacks (n8n-stack, vaul, swarthy-twitchbot)
 git clone <url> web-swarthy
 cd web-swarthy
 
@@ -88,10 +94,10 @@ En `Settings -> Secrets and variables -> Actions -> New repository secret`:
 | Secret | Valor |
 | --- | --- |
 | `DEPLOY_HOST` | `143.47.52.87` |
-| `DEPLOY_USER` | `root` (mejor un usuario `deploy` en el grupo `docker`) |
-| `DEPLOY_PATH` | ruta del clone en el servidor, p.ej. `/opt/web-swarthy` |
+| `DEPLOY_USER` | `ubuntu` (ya está en el grupo `docker`, no necesita sudo) |
+| `DEPLOY_PATH` | `/opt/web-swarthy` |
 | `DEPLOY_SSH_KEY` | clave **privada** ed25519 sin passphrase, entera con cabecera y pie |
-| `DEPLOY_SSH_KNOWN_HOSTS` | salida de `ssh-keyscan -H 143.47.52.87` |
+| `DEPLOY_SSH_KNOWN_HOSTS` | salida de `ssh-keyscan 143.47.52.87` |
 | `DEPLOY_PORT` | opcional, solo si SSH no escucha en el 22 |
 
 Y opcionalmente, en la pestana *Variables*, `HEALTH_URL` si cambias el puerto
@@ -105,17 +111,29 @@ En tu maquina (no reutilices tu clave personal):
 ssh-keygen -t ed25519 -C "github-actions-web-swarthy" -f ~/.ssh/web_swarthy_deploy -N ""
 
 # autorizarla en el servidor
-ssh-copy-id -i ~/.ssh/web_swarthy_deploy.pub root@143.47.52.87
+ssh-copy-id -i ~/.ssh/web_swarthy_deploy.pub ubuntu@143.47.52.87
 
 # el contenido de estos dos comandos es lo que pegas en los secrets
 cat ~/.ssh/web_swarthy_deploy        # -> DEPLOY_SSH_KEY
-ssh-keyscan -H 143.47.52.87         # -> DEPLOY_SSH_KNOWN_HOSTS
+ssh-keyscan 143.47.52.87             # -> DEPLOY_SSH_KNOWN_HOSTS
+```
+
+> **Si cambias de servidor, regenera `DEPLOY_SSH_KNOWN_HOSTS`.** Es el error más fácil de
+> cometer: al migrar de máquina se actualizan `DEPLOY_HOST`/`DEPLOY_USER`/`DEPLOY_PATH`,
+> se olvida el `known_hosts`, y el despliegue muere con un escueto
+> `Host key verification failed` (exit 255) sin llegar a ejecutar nada. El paso
+> *Comprobar acceso al servidor* del workflow detecta ahora ese caso y lo dice.
+
+Para actualizarlo desde la línea de comandos:
+
+```bash
+ssh-keyscan 143.47.52.87 | gh secret set DEPLOY_SSH_KNOWN_HOSTS
 ```
 
 ### Requisitos en el servidor antes del primer push
 
 ```bash
-ssh root@143.47.52.87
+ssh ubuntu@143.47.52.87
 cd /opt/web-swarthy
 git remote -v                 # debe apuntar a github.com/fjhornero/web-swarthy
 git checkout main
@@ -135,8 +153,8 @@ Actions -> Deploy -> *Run workflow*. Util para redesplegar sin commit nuevo.
 ## Actualizaciones manuales
 
 ```bash
-ssh root@143.47.52.87
-cd /opt/web-swarthy   # o donde lo hayas clonado
+ssh ubuntu@143.47.52.87
+cd /opt/web-swarthy
 git pull
 docker compose build
 docker compose up -d
