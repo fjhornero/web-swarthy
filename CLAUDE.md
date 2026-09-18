@@ -49,7 +49,7 @@ Single long-scroll landing page modeled after the **DJSwarthy Academy** referenc
 
 ## Deployment
 
-Target server: `ssh root@143.47.52.87` (existing nginx + certbot + n8n stack). **nginx runs on the host, not in Docker** — the compose publishes the container only on the loopback (`127.0.0.1:3001 -> 3000`) and nginx `proxy_pass`es to it. The image is built and stored on that same server; there is no registry.
+Target server: `ssh ubuntu@143.47.52.87` (aarch64/ARM, existing nginx + certbot + n8n stack). The deploy user is `ubuntu`, already in the `docker` group — no `sudo` needed, and nothing runs as `root`. **nginx runs on the host, not in Docker** — the compose publishes the container only on the loopback (`127.0.0.1:3001 -> 3000`) and nginx `proxy_pass`es to it. The image is built and stored on that same server; there is no registry.
 
 - `Dockerfile` — multi-stage (deps → builder → runner). `node:20-alpine`, runs as non-root, executes `node server.js` from the `standalone` output.
 - `docker-compose.yml` — single `web` service, no custom networks: it publishes `127.0.0.1:3001 -> 3000` so the host's nginx can reach it over the loopback. Healthcheck against `localhost:3000` inside the container.
