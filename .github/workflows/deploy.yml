@@ -5,6 +5,11 @@ on:
     branches: [main]
   workflow_dispatch:
 
+# El token del job sólo necesita leer el repositorio; el servidor se despliega
+# por SSH con la clave de los secrets.
+permissions:
+  contents: read
+
 concurrency:
   group: deploy-produccion
   cancel-in-progress: false
@@ -49,7 +54,7 @@ jobs:
             exit 1
           fi
 
-          if ! ssh -i ~/.ssh/id_deploy -p "$DEPLOY_PORT" -o BatchMode=yes -o ConnectTimeout=15 \
+          if ! ssh -i ~/.ssh/id_deploy -o IdentitiesOnly=yes -p "$DEPLOY_PORT" -o BatchMode=yes -o ConnectTimeout=15 \
                "$DEPLOY_USER@$DEPLOY_HOST" \
                "test -d '$DEPLOY_PATH/.git' && docker compose version" > /dev/null 2>&1; then
             echo "::error::No se pudo entrar como $DEPLOY_USER, o $DEPLOY_PATH no es un clone git, o el usuario no puede usar docker (grupo docker)."
@@ -61,7 +66,7 @@ jobs:
           # SSH (git@github.com:...) el usuario de despliegue necesitaria su propia
           # clave y su propio known_hosts, y el fallo aparece a mitad del script
           # remoto como un "Host key verification failed" que parece del servidor.
-          if ! ssh -i ~/.ssh/id_deploy -p "$DEPLOY_PORT" -o BatchMode=yes -o ConnectTimeout=15 \
+          if ! ssh -i ~/.ssh/id_deploy -o IdentitiesOnly=yes -p "$DEPLOY_PORT" -o BatchMode=yes -o ConnectTimeout=15 \
                "$DEPLOY_USER@$DEPLOY_HOST" \
                "cd '$DEPLOY_PATH' && GIT_TERMINAL_PROMPT=0 git ls-remote --exit-code origin HEAD" > /dev/null 2>&1; then
             echo "::error::El clone de $DEPLOY_PATH no puede leer el remoto. Ponlo en HTTPS: git -C $DEPLOY_PATH remote set-url origin https://github.com/${{ github.repository }}.git"
@@ -77,10 +82,14 @@ jobs:
           HEALTH_URL: ${{ vars.HEALTH_URL || 'http://127.0.0.1:3001/api/health' }}
           TARGET_SHA: ${{ github.sha }}
         run: |
-          ssh -i ~/.ssh/id_deploy -p "$DEPLOY_PORT" -o BatchMode=yes \
+          # Los valores viajan como argumentos posicionales (bash -s --) y no
+          # interpolados en la cadena del comando: una comilla en un secret no
+          # puede romper ni alterar el script remoto.
+          ssh -i ~/.ssh/id_deploy -o IdentitiesOnly=yes -p "$DEPLOY_PORT" -o BatchMode=yes \
             "$DEPLOY_USER@$DEPLOY_HOST" \
-            "DEPLOY_PATH='$DEPLOY_PATH' HEALTH_URL='$HEALTH_URL' TARGET_SHA='$TARGET_SHA' bash -s" <<'REMOTE'
+            "bash -s -- $(printf '%q %q %q' "$DEPLOY_PATH" "$HEALTH_URL" "$TARGET_SHA")" <<'REMOTE'
           set -euo pipefail
+          DEPLOY_PATH="$1"; HEALTH_URL="$2"; TARGET_SHA="$3"
 
           cd "$DEPLOY_PATH"
 
@@ -108,7 +117,9 @@ jobs:
           echo "==> FALLO: el servicio no responde. Revirtiendo a $PREV_SHA" >&2
           docker compose logs --tail 80 web >&2 || true
           git reset --hard "$PREV_SHA"
-          docker compose up -d --build
+          if ! docker compose up -d --build; then
+            echo "==> FALLO CRÍTICO: la reconstrucción del commit anterior también ha fallado. La web puede estar caída." >&2
+          fi
           exit 1
           REMOTE
 

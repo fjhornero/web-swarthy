@@ -1,9 +1,10 @@
 import type { MetadataRoute } from "next";
+import { SITE_URL, CONTENT_UPDATED_AT } from "@/lib/site";
 
-const SITE_URL = "https://djswarthy.es";
-
+// /privacidad no va en el sitemap: es una página legal con `noindex` y no
+// aporta nada a la indexación. Sigue enlazada desde el footer y los formularios.
 export default function sitemap(): MetadataRoute.Sitemap {
-  const lastModified = new Date();
+  const lastModified = new Date(CONTENT_UPDATED_AT);
 
   return [
     {
@@ -17,12 +18,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified,
       changeFrequency: "monthly",
       priority: 0.6,
-    },
-    {
-      url: `${SITE_URL}/privacidad`,
-      lastModified,
-      changeFrequency: "yearly",
-      priority: 0.2,
     },
   ];
 }

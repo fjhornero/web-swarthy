@@ -1,10 +1,11 @@
-"use client";
-
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { Play, ArrowRight } from "lucide-react";
 import { site } from "@/lib/data";
 
+const GENRES = ["Trance", "Progressive", "Tech House", "House", "Nu Disco", "Remember"];
+
+// Server component: la entrada se anima con CSS (clase `fade-up`) y no con
+// Framer Motion, de modo que texto y CTAs se pintan aunque el JS tarde.
 export function Hero() {
   return (
     <section
@@ -19,63 +20,62 @@ export function Hero() {
 
       <div className="relative mx-auto max-w-5xl px-5 text-center md:px-8">
         {/* overline */}
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="mb-6 inline-flex items-center gap-2 rounded-full border border-border-dark bg-dark-secondary/50 px-4 py-1.5 text-xs uppercase tracking-[0.2em] text-text-secondary"
+        <p
+          className="fade-up mb-6 inline-flex items-center gap-2 rounded-full border border-border-dark bg-dark-secondary/50 px-4 py-1.5 text-xs uppercase tracking-[0.2em] text-text-secondary"
         >
-          <span className="relative flex h-1.5 w-1.5">
+          <span className="relative flex h-1.5 w-1.5" aria-hidden="true">
             <span className="absolute inset-0 rounded-full bg-accent-red pulse-dot" />
             <span className="absolute inset-0 rounded-full bg-accent-red" />
           </span>
           {site.hero.overline}
-        </motion.div>
+        </p>
 
-        {/* headline — sin animación de opacidad a propósito: es el elemento LCP
-            y arrancar en opacity:0 retrasaba su pintado ~1s, hasta que hidrataba
-            Framer Motion. */}
+        {/* headline — es el elemento LCP: sin animación de opacidad a propósito.
+            El prefijo sólo para lectores de pantalla pone la entidad y la
+            intención ("DJ en Madrid") en el h1 sin tocar el diseño. */}
         <h1 className="font-display text-5xl uppercase leading-[0.95] tracking-tight md:text-7xl lg:text-8xl">
-          MUSIC IS THE <span className="text-gradient">ANSWER</span>
+          <span className="sr-only">DJ Swarthy, DJ en Madrid. </span>
+          <span lang="en">
+            MUSIC IS THE <span className="text-gradient">ANSWER</span>
+          </span>
         </h1>
 
         {/* sub */}
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.3 }}
-          className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-text-secondary md:text-lg"
+        <p
+          className="fade-up mx-auto mt-6 max-w-2xl text-base leading-relaxed text-text-secondary md:text-lg"
+          style={{ animationDelay: "0.2s" }}
         >
           {site.hero.subheadline}
-        </motion.p>
+        </p>
 
         {/* trust bar — géneros */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.45 }}
-          className="mt-8 flex flex-wrap items-center justify-center gap-x-2 gap-y-2 text-[10px] uppercase tracking-[0.25em] text-text-secondary"
+        <ul
+          className="fade-up mt-8 flex flex-wrap items-center justify-center gap-x-2 gap-y-2 text-[10px] uppercase tracking-[0.25em] text-text-secondary"
+          style={{ animationDelay: "0.35s" }}
+          aria-label="Estilos"
         >
-          {["Trance", "Progressive", "Tech House", "House", "Nu Disco", "Remember"].map((g, i, arr) => (
-            <span key={g} className="inline-flex items-center gap-2">
+          {GENRES.map((g, i, arr) => (
+            <li key={g} className="inline-flex items-center gap-2">
               <span className="text-text-primary">{g}</span>
-              {i < arr.length - 1 && <span className="text-accent-red/60">·</span>}
-            </span>
+              {i < arr.length - 1 && (
+                <span className="text-accent-red/60" aria-hidden="true">
+                  ·
+                </span>
+              )}
+            </li>
           ))}
-        </motion.div>
+        </ul>
 
         {/* CTAs */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.4 }}
-          className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4"
+        <div
+          className="fade-up mt-10 flex flex-col sm:flex-row items-center justify-center gap-4"
+          style={{ animationDelay: "0.3s" }}
         >
           <Link
             href={site.hero.primaryCta.href}
             className="group inline-flex items-center gap-2 gradient-primary px-7 py-4 text-sm font-semibold text-white rounded-full shadow-glow-strong transition-transform hover:scale-105"
           >
-            <Play size={16} className="fill-white" />
+            <Play size={16} className="fill-white" aria-hidden="true" />
             {site.hero.primaryCta.label}
           </Link>
           <Link
@@ -83,22 +83,24 @@ export function Hero() {
             className="group inline-flex items-center gap-2 border border-border-dark bg-dark-secondary/50 px-7 py-4 text-sm font-semibold text-text-primary rounded-full transition-colors hover:bg-dark-secondary"
           >
             {site.hero.secondaryCta.label}
-            <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
+            <ArrowRight
+              size={16}
+              className="transition-transform group-hover:translate-x-1"
+              aria-hidden="true"
+            />
           </Link>
-        </motion.div>
+        </div>
 
         {/* Ecualizador animado */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.9, delay: 0.6 }}
-          className="mt-16 flex flex-col items-center gap-4"
+        <div
+          className="fade-up mt-16 flex flex-col items-center gap-4"
+          style={{ animationDelay: "0.5s" }}
         >
           <Equalizer />
           <span className="text-[10px] uppercase tracking-[0.4em] text-text-secondary">
             Madrid · España
           </span>
-        </motion.div>
+        </div>
       </div>
     </section>
   );
@@ -109,7 +111,7 @@ const BAR_DURATIONS = [0.7, 0.9, 0.6, 1.1, 0.8, 0.65, 0.95, 0.75, 1.0, 0.85, 0.7
 
 function Equalizer() {
   return (
-    <div className="flex items-end justify-center gap-1 h-16 w-full max-w-sm">
+    <div className="flex items-end justify-center gap-1 h-16 w-full max-w-sm" aria-hidden="true">
       {BAR_DELAYS.map((delay, i) => (
         <div
           key={i}

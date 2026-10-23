@@ -38,6 +38,10 @@ yarn-error.log*
 # vercel
 .vercel
 
+# cachés de herramientas locales (pi-lens, etc.): no son código del proyecto
+.pi/
+.pi-lens/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

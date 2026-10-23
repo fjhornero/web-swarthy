@@ -1,37 +1,37 @@
-"use client";
-
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { Reveal } from "@/components/motion/Reveal";
+import { SectionHeading } from "@/components/SectionHeading";
 import { site } from "@/lib/data";
 
 export function Venues() {
   return (
     <section id="venues" className="relative bg-dark-primary py-20 md:py-28">
       <div className="mx-auto max-w-6xl px-5 md:px-8">
-        <div className="text-center mb-14">
-          <div className="mb-3 text-xs uppercase tracking-[0.2em] text-accent-orange">
-            ★ DONDE HA PINCHADO
-          </div>
-          <h2 className="font-display text-4xl uppercase md:text-6xl">
-            Clubs y festivales que <span className="text-gradient">confían</span>
-          </h2>
-        </div>
+        <SectionHeading
+          overline="DONDE HA PINCHADO"
+          title={
+            <>
+              Clubs y festivales que <span className="text-gradient">confían</span>
+            </>
+          }
+        />
 
-        <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+        <ul className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
           {site.venues.map((v, i) => (
-            <motion.div
+            <Reveal
+              as="li"
               key={v.name + v.year}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.5, delay: i * 0.07 }}
+              delay={i * 0.07}
+              y={20}
               className="card-lift relative aspect-video overflow-hidden rounded-2xl border border-border-dark group"
             >
               {v.img ? (
                 <>
+                  {/* El nombre y la ciudad van en texto justo debajo: la foto
+                      no aporta nada nuevo al lector de pantalla. */}
                   <Image
                     src={v.img}
-                    alt={`${v.name}, ${v.city}`}
+                    alt=""
                     fill
                     className="object-cover saturate-[0.55] brightness-90 transition-all duration-700 group-hover:scale-105 group-hover:saturate-100 group-hover:brightness-100"
                     sizes="(max-width: 768px) 100vw, 33vw"
@@ -57,21 +57,21 @@ export function Venues() {
                 </>
               )}
 
-              <span className="absolute top-3 right-3 rounded-full border border-white/15 bg-black/50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.15em] text-white backdrop-blur-sm">
+              <span className="absolute top-3 right-3 rounded-full border border-white/15 bg-black/50 px-2.5 py-1 text-xs font-semibold uppercase tracking-[0.15em] text-white backdrop-blur-sm">
                 {v.year}
               </span>
 
               <div className="absolute bottom-4 left-4 right-4">
-                <div className="font-display text-xl uppercase md:text-2xl text-white">
+                <h3 className="font-display text-xl uppercase md:text-2xl text-white">
                   {v.name}
-                </div>
+                </h3>
                 <div className="mt-1 text-xs uppercase tracking-[0.15em] text-accent-orange">
                   {v.city}
                 </div>
               </div>
-            </motion.div>
+            </Reveal>
           ))}
-        </div>
+        </ul>
       </div>
     </section>
   );

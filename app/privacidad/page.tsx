@@ -3,13 +3,24 @@ import Link from "next/link";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { site } from "@/lib/data";
-import { SITE_URL } from "@/lib/json-ld";
+import { SITE_URL } from "@/lib/site";
 
+const description =
+  "Cómo trata DJ Swarthy los datos personales enviados a través de los formularios de contratación y contacto de djswarthy.es.";
+
+// Página legal: enlazada desde el footer y los formularios, pero fuera del
+// índice (noindex, follow) y del sitemap. No aporta nada a la búsqueda.
 export const metadata: Metadata = {
   title: "Política de privacidad",
-  description:
-    "Cómo trata DJ Swarthy los datos personales enviados a través de los formularios de contratación y contacto de djswarthy.es.",
+  description,
   alternates: { canonical: `${SITE_URL}/privacidad` },
+  robots: { index: false, follow: true },
+  openGraph: {
+    type: "website",
+    url: `${SITE_URL}/privacidad`,
+    title: "Política de privacidad | DJ Swarthy",
+    description,
+  },
 };
 
 export default function PrivacidadPage() {
@@ -22,7 +33,7 @@ export default function PrivacidadPage() {
             Política de <span className="text-gradient">privacidad</span>
           </h1>
           <p className="mt-4 text-sm text-text-secondary">
-            Última actualización: agosto de 2026
+            Última actualización: octubre de 2026
           </p>
 
           <div className="mt-12 space-y-10 text-text-secondary [&_a:hover]:underline [&_a]:text-accent-orange [&_h2]:font-display [&_h2]:text-2xl [&_h2]:uppercase [&_h2]:text-text-primary [&_h2]:md:text-3xl [&_li]:list-disc [&_li]:leading-relaxed [&_p]:mt-3 [&_p]:leading-relaxed [&_ul]:mt-3 [&_ul]:space-y-2 [&_ul]:pl-5">
@@ -182,7 +193,7 @@ export default function PrivacidadPage() {
               href="/"
               className="inline-flex items-center gap-2 text-sm text-accent-orange hover:underline"
             >
-              ← Volver a la portada
+              <span aria-hidden="true">←</span> Volver a la portada
             </Link>
           </div>
         </div>

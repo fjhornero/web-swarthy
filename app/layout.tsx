@@ -1,7 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import { Bebas_Neue, Inter } from "next/font/google";
 import "./globals.css";
-import { SITE_URL, SITE_NAME, OG_IMAGE, jsonLdString } from "@/lib/json-ld";
+import { MotionProvider } from "@/components/motion/MotionProvider";
+import { buildJsonLdString } from "@/lib/json-ld";
+import { SITE_URL, SITE_NAME } from "@/lib/site";
 
 const bebas = Bebas_Neue({
   variable: "--font-bebas",
@@ -16,37 +18,19 @@ const inter = Inter({
   display: "swap",
 });
 
+// La imagen social (OpenGraph/Twitter, 1200x630) la genera app/opengraph-image.tsx
+// por convención de ficheros: no se declara aquí.
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "DJ Swarthy — DJ Madrid · Trance, House, Tech House y Nu Disco · Booking",
+    default: "DJ Swarthy | DJ en Madrid · Contratar DJ para clubs y eventos",
     template: "%s | DJ Swarthy",
   },
   description:
-    "DJ Swarthy: 19 años pinchando trance, progressive, tech house, house, nu disco y remember. DJ profesional en Madrid disponible para clubs, festivales y eventos privados. Contratación directa.",
+    "DJ Swarthy, DJ en Madrid con 19 años de experiencia: trance, tech house, house y remember. Contrata un DJ para clubs, festivales, bodas y eventos privados.",
   applicationName: SITE_NAME,
   authors: [{ name: "DJ Swarthy", url: SITE_URL }],
-  generator: "Next.js",
-  keywords: [
-    "DJ Swarthy",
-    "DJ Madrid",
-    "contratar DJ Madrid",
-    "DJ trance Madrid",
-    "DJ progressive Madrid",
-    "DJ tech house Madrid",
-    "DJ house Madrid",
-    "DJ remember Madrid",
-    "DJ nu disco",
-    "booking DJ España",
-    "DJ profesional Madrid",
-    "DJ eventos privados",
-    "DJ bodas Madrid",
-    "DJ fiestas Madrid",
-    "DJ residente",
-    "DJ todo terreno",
-    "Music is the answer",
-  ],
-  referrer: "origin-when-cross-origin",
+  referrer: "strict-origin-when-cross-origin",
   creator: "DJ Swarthy",
   publisher: "DJ Swarthy",
   alternates: {
@@ -61,21 +45,12 @@ export const metadata: Metadata = {
     title: "DJ Swarthy — DJ profesional en Madrid · Booking abierto",
     description:
       "DJ con 19 años de experiencia. Trance, house, tech house, nu disco y remember. Disponible para clubs, festivales y eventos privados.",
-    images: [
-      {
-        url: OG_IMAGE,
-        width: 864,
-        height: 1212,
-        alt: "DJ Swarthy",
-      },
-    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "DJ Swarthy — DJ profesional en Madrid",
     description:
       "19 años pinchando trance, house, tech house y nu disco. Booking abierto para clubs, festivales y eventos.",
-    images: [OG_IMAGE],
     creator: "@DjSwarthy",
   },
   robots: {
@@ -92,10 +67,11 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },
-      { url: "/logo-isotype.png", type: "image/png" },
+      { url: "/icon-192.png", type: "image/png", sizes: "192x192" },
+      { url: "/icon-512.png", type: "image/png", sizes: "512x512" },
     ],
     shortcut: "/favicon.ico",
-    apple: { url: "/logo-isotype.png", sizes: "180x180" },
+    apple: { url: "/apple-touch-icon.png", sizes: "180x180" },
   },
 };
 
@@ -115,13 +91,15 @@ export default function RootLayout({
       className={`${bebas.variable} ${inter.variable}`}
     >
       <head>
+        {/* Se construye en cada render: el nodo de eventos depende de la fecha. */}
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: jsonLdString }}
+          dangerouslySetInnerHTML={{ __html: buildJsonLdString() }}
         />
-        <link rel="preconnect" href="https://www.youtube-nocookie.com" />
-        <link rel="preconnect" href="https://w.soundcloud.com" />
-        <link rel="dns-prefetch" href="https://i.ytimg.com" />
+        {/* Sólo Plausible: los reproductores de YouTube/SoundCloud/Spotify son
+            fachadas que no conectan con nadie hasta el clic, y las miniaturas
+            se sirven desde /_next/image (mismo origen), así que preconectar
+            con esos dominios en cada visita era trabajo inútil. */}
         <link rel="preconnect" href="https://plausible.io" />
       </head>
       <body className="bg-dark-primary text-text-primary antialiased">
@@ -136,7 +114,7 @@ export default function RootLayout({
           data-domain="djswarthy.es"
           src="https://plausible.io/js/script.js"
         />
-        {children}
+        <MotionProvider>{children}</MotionProvider>
       </body>
     </html>
   );

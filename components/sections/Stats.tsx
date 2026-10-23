@@ -1,6 +1,4 @@
-"use client";
-
-import { motion } from "framer-motion";
+import { Reveal } from "@/components/motion/Reveal";
 import { site } from "@/lib/data";
 
 export function Stats() {
@@ -12,12 +10,10 @@ export function Stats() {
       <div className="mx-auto max-w-6xl px-5 md:px-8">
         <dl className="grid grid-cols-2 md:grid-cols-4">
           {site.stats.map((s, i) => (
-            <motion.div
+            <Reveal
               key={s.label}
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-40px" }}
-              transition={{ duration: 0.5, delay: i * 0.08 }}
+              delay={i * 0.08}
+              margin="-40px"
               className={`flex flex-col-reverse items-center gap-1 px-4 py-8 text-center md:py-10 ${
                 i % 2 === 0 ? "border-r border-border-dark" : ""
               } md:[&:not(:last-child)]:border-r ${
@@ -32,7 +28,7 @@ export function Stats() {
               <dd className="m-0 font-display text-4xl uppercase leading-none text-gradient md:text-5xl">
                 {s.value}
               </dd>
-            </motion.div>
+            </Reveal>
           ))}
         </dl>
       </div>

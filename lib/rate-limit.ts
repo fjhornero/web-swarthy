@@ -2,7 +2,10 @@
 // El contenedor corre como instancia única detrás de nginx (ver docker-compose.yml),
 // por lo que un Map en memoria del proceso es suficiente — no hace falta Redis/KV.
 // nginx (deploy/nginx-djswarthy.conf) es la única vía de entrada al contenedor y
-// siempre fija X-Real-IP/X-Forwarded-For, así que esas cabeceras son de fiar aquí.
+// siempre fija X-Real-IP con la IP real del cliente, así que es la única cabecera
+// en la que se confía. X-Forwarded-For se ignora a propósito: su primer valor lo
+// controla el cliente y serviría para saltarse el límite si el contenedor
+// quedase alguna vez accesible por otra vía.
 
 import { headers } from "next/headers";
 
@@ -14,8 +17,12 @@ const buckets = new Map<string, Bucket>();
 // sin límite entre reinicios del contenedor.
 const MAX_BUCKETS = 5000;
 
-export function checkRateLimit(key: string, limit: number, windowMs: number): boolean {
-  const now = Date.now();
+export function checkRateLimit(
+  key: string,
+  limit: number,
+  windowMs: number,
+  now: number = Date.now()
+): boolean {
   const bucket = buckets.get(key);
 
   if (!bucket || bucket.resetAt <= now) {
@@ -38,13 +45,13 @@ export function checkRateLimit(key: string, limit: number, windowMs: number): bo
   return true;
 }
 
+/** Sólo para tests: vacía los cubos entre casos. */
+export function resetRateLimit(): void {
+  buckets.clear();
+}
+
 export async function getClientIp(): Promise<string> {
   const h = await headers();
-  const realIp = h.get("x-real-ip");
-  if (realIp) return realIp;
-
-  const forwardedFor = h.get("x-forwarded-for");
-  if (forwardedFor) return forwardedFor.split(",")[0].trim();
-
-  return "unknown";
+  const realIp = h.get("x-real-ip")?.trim();
+  return realIp || "unknown";
 }

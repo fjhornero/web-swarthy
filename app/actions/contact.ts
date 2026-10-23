@@ -3,6 +3,8 @@
 import {
   EMAIL_REGEX,
   FIELD_LIMITS,
+  cleanField,
+  cleanLine,
   escapeHtml,
   sendTelegramMessage,
 } from "@/lib/telegram";
@@ -24,7 +26,12 @@ export type ContactFields = {
 };
 
 export async function submitContact(fields: ContactFields): Promise<ContactState> {
-  if (fields.web) {
+  // Endpoint público: el payload puede no ser el objeto que declara el tipo.
+  if (!fields || typeof fields !== "object") {
+    return { success: false, error: "Solicitud no válida." };
+  }
+
+  if (typeof fields.web === "string" && fields.web) {
     // Bot detectado: respondemos éxito sin enviar nada
     return { success: true };
   }
@@ -37,9 +44,9 @@ export async function submitContact(fields: ContactFields): Promise<ContactState
     };
   }
 
-  const nombre = fields.nombre?.trim().slice(0, FIELD_LIMITS.short);
-  const email = fields.email?.trim().slice(0, FIELD_LIMITS.email);
-  const mensaje = fields.mensaje?.trim().slice(0, FIELD_LIMITS.message);
+  const nombre = cleanLine(fields.nombre, FIELD_LIMITS.short);
+  const email = cleanLine(fields.email, FIELD_LIMITS.email);
+  const mensaje = cleanField(fields.mensaje, FIELD_LIMITS.message);
 
   if (!nombre || !email || !mensaje) {
     return { success: false, error: "Completa todos los campos obligatorios." };
@@ -51,7 +58,7 @@ export async function submitContact(fields: ContactFields): Promise<ContactState
 
   // Se revalida en servidor: la casilla del formulario es la base legal del
   // tratamiento y un envío programático podría saltársela.
-  if (!fields.consentimiento) {
+  if (fields.consentimiento !== true) {
     return {
       success: false,
       error: "Necesitamos tu consentimiento para tratar los datos del formulario.",

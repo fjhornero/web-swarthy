@@ -17,6 +17,11 @@ import { site } from "./data";
 // El id vive en lib/data.ts (fuente única de contenido); aquí sólo se usa.
 const ARTIST_ID = site.spotifyArtistId;
 const ARTIST_URL = `https://open.spotify.com/artist/${ARTIST_ID}`;
+const SPOTIFY_TIMEOUT_MS = 8_000;
+// Ids de Spotify: 22 caracteres base62. Se validan antes de usarlos en la URL
+// del iframe del reproductor.
+const SPOTIFY_ID = /^[A-Za-z0-9]{22}$/;
+const SPOTIFY_IMAGE_URL = /^https:\/\/[a-z0-9.-]+\.(scdn\.co|spotifycdn\.com)\//;
 
 export interface SpotifyRelease {
   id: string;
@@ -58,9 +63,15 @@ async function getAccessToken(): Promise<string | null> {
         "Content-Type": "application/x-www-form-urlencoded",
       },
       body: "grant_type=client_credentials",
-      cache: "no-store",
+      // Sin `cache: "no-store"` a propósito: un POST nunca entra en el Data
+      // Cache, pero esa opción sí marcaría la home como dinámica y le quitaría
+      // la revalidación estática horaria en cuanto hubiera credenciales.
+      signal: AbortSignal.timeout(SPOTIFY_TIMEOUT_MS),
     });
-    if (!res.ok) return null;
+    if (!res.ok) {
+      console.error(`Spotify token: HTTP ${res.status}`);
+      return null;
+    }
 
     const json = (await res.json()) as { access_token?: string; expires_in?: number };
     if (!json.access_token) return null;
@@ -98,9 +109,13 @@ export async function getSpotifyReleases(limit = 12): Promise<SpotifyRelease[]> 
       {
         headers: { Authorization: `Bearer ${token}` },
         next: { revalidate: 3600 },
+        signal: AbortSignal.timeout(SPOTIFY_TIMEOUT_MS),
       }
     );
-    if (!res.ok) return [];
+    if (!res.ok) {
+      console.error(`Spotify albums: HTTP ${res.status}`);
+      return [];
+    }
 
     const json = (await res.json()) as { items?: SpotifyAlbumApi[] };
     const items = json.items ?? [];
@@ -111,16 +126,19 @@ export async function getSpotifyReleases(limit = 12): Promise<SpotifyRelease[]> 
     const releases: SpotifyRelease[] = [];
 
     for (const album of items) {
+      if (!album?.id || !SPOTIFY_ID.test(album.id) || !album.name) continue;
       const key = album.name.trim().toLowerCase();
       if (seen.has(key)) continue;
       seen.add(key);
+
+      const artwork = album.images?.[0]?.url;
 
       releases.push({
         id: album.id,
         name: album.name,
         type: album.album_group ?? album.album_type,
-        url: album.external_urls?.spotify ?? `https://open.spotify.com/album/${album.id}`,
-        artwork: album.images?.[0]?.url,
+        url: `https://open.spotify.com/album/${album.id}`,
+        artwork: artwork && SPOTIFY_IMAGE_URL.test(artwork) ? artwork : undefined,
         releaseDate: album.release_date ?? "",
         totalTracks: album.total_tracks ?? 0,
       });
@@ -138,14 +156,15 @@ export async function getSpotifyArtistCard(): Promise<SpotifyArtistCard | null> 
   try {
     const res = await fetch(
       `https://open.spotify.com/oembed?url=${encodeURIComponent(ARTIST_URL)}`,
-      { next: { revalidate: 3600 } }
+      { next: { revalidate: 3600 }, signal: AbortSignal.timeout(SPOTIFY_TIMEOUT_MS) }
     );
     if (!res.ok) return null;
 
     const json = (await res.json()) as { title?: string; thumbnail_url?: string };
     if (!json.title) return null;
 
-    return { name: json.title, image: json.thumbnail_url };
+    const image = json.thumbnail_url;
+    return { name: json.title, image: image && SPOTIFY_IMAGE_URL.test(image) ? image : undefined };
   } catch {
     return null;
   }

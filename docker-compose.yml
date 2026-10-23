@@ -12,10 +12,28 @@ services:
     image: web-swarthy:latest
     container_name: web-swarthy
     restart: unless-stopped
+    # tini como PID 1: node no reenvía SIGTERM a sus hijos ni responde bien
+    # como init, y sin esto `docker stop` esperaba 10 s y mataba el proceso.
+    init: true
     env_file:
       - .env.local
     ports:
       - "127.0.0.1:3001:3000"
+    # Endurecimiento: sin capacidades de kernel, sin escalada de privilegios
+    # y con límites de procesos y memoria para que un bug no se coma el host.
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 256
+    mem_limit: 768m
+    # Los logs del contenedor son la única traza de los formularios: acotados
+    # para que no crezcan sin límite en el disco del servidor.
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/api/health"]
       interval: 30s

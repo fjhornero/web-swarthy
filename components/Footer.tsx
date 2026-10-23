@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { NewTabHint } from "@/components/NewTabHint";
 import { site } from "@/lib/data";
 
 export function Footer() {
@@ -8,15 +9,15 @@ export function Footer() {
       <div className="mx-auto max-w-7xl px-5 py-12 md:px-8 md:py-16">
         <div className="grid gap-10 md:grid-cols-12">
           <div className="md:col-span-5">
-            <Link href="#top" className="flex items-center gap-3">
+            <Link href="/#top" className="flex items-center gap-3" aria-label="DJ Swarthy, inicio">
               <Image
                 src="/logo-isotype.png"
-                alt="Swarthy"
+                alt=""
                 width={48}
                 height={48}
                 className="invert"
               />
-              <span className="font-display text-3xl tracking-wider">
+              <span className="font-display text-3xl tracking-wider" aria-hidden="true">
                 SWARTHY
               </span>
             </Link>
@@ -29,10 +30,10 @@ export function Footer() {
             </p>
           </div>
 
-          <div className="md:col-span-3">
-            <h3 className="text-xs uppercase tracking-[0.2em] text-text-secondary">
+          <nav className="md:col-span-3" aria-labelledby="footer-nav-title">
+            <h2 id="footer-nav-title" className="text-xs uppercase tracking-[0.2em] text-text-secondary">
               Navegación
-            </h3>
+            </h2>
             <ul className="mt-4 space-y-2 text-sm">
               <li><Link href="/#about" className="hover:text-accent-orange">Sobre Swarthy</Link></li>
               <li><Link href="/#mixes" className="hover:text-accent-orange">Sets</Link></li>
@@ -41,12 +42,12 @@ export function Footer() {
               <li><Link href="/#booking" className="hover:text-accent-orange">Booking</Link></li>
               <li><Link href="/press-kit" className="hover:text-accent-orange">Press kit</Link></li>
             </ul>
-          </div>
+          </nav>
 
-          <div className="md:col-span-4">
-            <h3 className="text-xs uppercase tracking-[0.2em] text-text-secondary">
+          <nav className="md:col-span-4" aria-labelledby="footer-social-title">
+            <h2 id="footer-social-title" className="text-xs uppercase tracking-[0.2em] text-text-secondary">
               Sígueme
-            </h3>
+            </h2>
             <ul className="mt-4 grid grid-cols-2 gap-2 text-sm">
               {site.socials.map((s) => (
                 <li key={s.label}>
@@ -56,7 +57,8 @@ export function Footer() {
                     rel="noopener noreferrer"
                     className="text-text-primary hover:text-accent-orange"
                   >
-                    {s.label} ↗
+                    {s.label} <span aria-hidden="true">↗</span>
+                    <NewTabHint />
                   </Link>
                 </li>
               ))}
@@ -67,7 +69,7 @@ export function Footer() {
             >
               {site.bookingEmail}
             </Link>
-          </div>
+          </nav>
         </div>
 
         <div className="mt-12 flex flex-col gap-3 border-t border-border-dark pt-6 text-xs uppercase tracking-[0.2em] text-text-secondary md:flex-row md:items-center md:justify-between">

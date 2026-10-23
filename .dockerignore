@@ -11,3 +11,4 @@ Dockerfile
 docker-compose.yml
 deploy
 *.log
+assets/fonts/OFL-BebasNeue.txt
