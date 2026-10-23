@@ -5,6 +5,10 @@ on:
   workflow_call:
   workflow_dispatch:
 
+# El token del job sólo necesita leer el repositorio.
+permissions:
+  contents: read
+
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -20,10 +24,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
-      - name: Node 20 (mismo que el Dockerfile)
+      - name: Node 22 (mismo que el Dockerfile)
         uses: actions/setup-node@v5
         with:
-          node-version: "20"
+          node-version: "22"
           cache: npm
 
       - name: Restaurar cache de build de Next
@@ -41,7 +45,17 @@ jobs:
         run: npm run lint
 
       - name: Comprobar tipos
-        run: npx tsc --noEmit
+        run: npm run typecheck
+
+      - name: Tests unitarios
+        run: npm test
+
+      # Nivel "critical" y no "high": Next 15.5.x lleva anidado un postcss
+      # 8.4.31 con un aviso "high" (sólo se usa en el build, no en runtime) que
+      # únicamente se corrige subiendo a Next 16. Cuando se haga esa migración,
+      # bajar aquí a --audit-level=high.
+      - name: Vulnerabilidades conocidas en dependencias
+        run: npm audit --omit=dev --audit-level=critical
 
       - name: Build de produccion
         run: npm run build

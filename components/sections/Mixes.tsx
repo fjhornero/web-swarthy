@@ -1,9 +1,9 @@
-"use client";
-
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { Youtube, Music, ExternalLink } from "lucide-react";
 import { MediaFacade } from "@/components/MediaFacade";
+import { Reveal } from "@/components/motion/Reveal";
+import { SectionHeading } from "@/components/SectionHeading";
+import { NewTabHint } from "@/components/NewTabHint";
 import type { VideoItem, TrackItem } from "@/lib/feeds";
 
 interface MixesProps {
@@ -15,14 +15,16 @@ interface MixesProps {
 const SECONDARY_LIMIT = 6;
 
 // Las fechas llegan en formatos distintos (YouTube en ISO 8601, SoundCloud en
-// RFC 2822), pero ambos los parsea Date. Las normalizamos a español para que
-// las dos tarjetas muestren el mismo estilo. Cuando YouTube se raspa de la
+// RFC 2822), pero ambos los parsea Date. Se formatean en una zona horaria
+// fija: el componente se renderiza en el servidor y la etiqueta no debe
+// depender de dónde corra el contenedor. Cuando YouTube se raspa de la
 // página del canal no hay fecha exacta, sólo la antigüedad relativa, así que
 // las tarjetas caen a esa etiqueta en lugar de quedarse sin dato.
 const dateFormatter = new Intl.DateTimeFormat("es-ES", {
   day: "numeric",
   month: "long",
   year: "numeric",
+  timeZone: "Europe/Madrid",
 });
 
 function formatDate(raw: string, fallbackLabel?: string): string {
@@ -48,18 +50,18 @@ export function Mixes({ videos, tracks }: MixesProps) {
   return (
     <section id="mixes" className="relative bg-dark-secondary py-20 md:py-28">
       <div className="mx-auto max-w-6xl px-5 md:px-8">
-        <div className="text-center mb-14">
-          <div className="mb-3 text-xs uppercase tracking-[0.2em] text-accent-orange">
-            ★ ÚLTIMAS SESIONES
-          </div>
-          <h2 className="font-display text-4xl uppercase md:text-6xl">
-            Escucha y <span className="text-gradient">mira en directo</span>
-          </h2>
-        </div>
+        <SectionHeading
+          overline="ÚLTIMAS SESIONES"
+          title={
+            <>
+              Escucha y <span className="text-gradient">mira en directo</span>
+            </>
+          }
+        />
 
         <div className="grid gap-8 md:grid-cols-2">
           <PlatformCard
-            icon={<Youtube size={18} className="text-accent-orange" />}
+            icon={<Youtube size={18} className="text-accent-orange" aria-hidden="true" />}
             label="YouTube"
             delay={0}
           >
@@ -83,7 +85,7 @@ export function Mixes({ videos, tracks }: MixesProps) {
           </PlatformCard>
 
           <PlatformCard
-            icon={<Music size={18} className="text-accent-orange" />}
+            icon={<Music size={18} className="text-accent-orange" aria-hidden="true" />}
             label="SoundCloud"
             delay={0.1}
           >
@@ -111,14 +113,13 @@ export function Mixes({ videos, tracks }: MixesProps) {
             <h3 className="mb-6 text-xs uppercase tracking-[0.2em] text-text-secondary">
               Más sesiones
             </h3>
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {secondary.slice(0, SECONDARY_LIMIT).map((entry, i) => (
-                <motion.div
+                <Reveal
+                  as="li"
                   key={entry.kind + entry.item.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-50px" }}
-                  transition={{ duration: 0.5, delay: (i % 3) * 0.07 }}
+                  y={20}
+                  delay={(i % 3) * 0.07}
                   className="overflow-hidden rounded-2xl border border-border-dark bg-dark-primary"
                 >
                   {entry.kind === "video" ? (
@@ -137,9 +138,9 @@ export function Mixes({ videos, tracks }: MixesProps) {
                       )}
                     </span>
                   </div>
-                </motion.div>
+                </Reveal>
               ))}
-            </div>
+            </ul>
           </div>
         )}
       </div>
@@ -159,11 +160,10 @@ function PlatformCard({
   children: React.ReactNode;
 }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-50px" }}
-      transition={{ duration: 0.6, delay }}
+    <Reveal
+      y={30}
+      duration={0.6}
+      delay={delay}
       className="overflow-hidden rounded-2xl border border-border-dark bg-dark-primary"
     >
       <div className="flex items-center gap-2 border-b border-border-dark px-5 py-4">
@@ -173,7 +173,7 @@ function PlatformCard({
         </span>
       </div>
       {children}
-    </motion.div>
+    </Reveal>
   );
 }
 
@@ -192,7 +192,7 @@ function MediaMeta({
 }) {
   return (
     <div className="p-5">
-      <p className="line-clamp-2 text-sm font-semibold leading-snug">{title}</p>
+      <h3 className="line-clamp-2 text-sm font-semibold leading-snug">{title}</h3>
       <div className="mt-3 flex items-center justify-between">
         <span className="text-xs text-text-secondary">
           {formatDate(date, dateLabel)}
@@ -203,7 +203,8 @@ function MediaMeta({
           rel="noopener noreferrer"
           className="inline-flex items-center gap-1 text-xs text-accent-orange hover:underline"
         >
-          {linkLabel} <ExternalLink size={11} />
+          {linkLabel} <ExternalLink size={11} aria-hidden="true" />
+          <NewTabHint />
         </Link>
       </div>
     </div>
@@ -251,7 +252,8 @@ function FallbackCard({ href, label }: { href: string; label: string }) {
         rel="noopener noreferrer"
         className="inline-flex items-center gap-2 text-sm text-accent-orange hover:underline"
       >
-        {label} <ExternalLink size={14} />
+        {label} <ExternalLink size={14} aria-hidden="true" />
+        <NewTabHint />
       </Link>
     </div>
   );

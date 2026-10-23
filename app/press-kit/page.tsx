@@ -5,13 +5,23 @@ import { Download, Mail } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { site } from "@/lib/data";
-import { SITE_URL } from "@/lib/json-ld";
+import { SITE_URL } from "@/lib/site";
 
+const description =
+  "Dossier de prensa de DJ Swarthy: biografía, rider técnico, fotografías en alta resolución, logotipos y contacto de booking.";
+
+// openGraph se declara aquí porque Next no lo hereda del layout en profundidad:
+// sin esto, compartir /press-kit mostraría la url y el título de la portada.
 export const metadata: Metadata = {
   title: "Press kit",
-  description:
-    "Dossier de prensa de DJ Swarthy: biografía, rider técnico, fotografías en alta resolución, logotipos y contacto de booking.",
+  description,
   alternates: { canonical: `${SITE_URL}/press-kit` },
+  openGraph: {
+    type: "website",
+    url: `${SITE_URL}/press-kit`,
+    title: "Press kit | DJ Swarthy",
+    description,
+  },
 };
 
 export default function PressKitPage() {
@@ -20,9 +30,9 @@ export default function PressKitPage() {
       <Navbar />
       <main id="main-content" className="bg-dark-primary pb-24 pt-32 md:pt-40">
         <div className="mx-auto max-w-4xl px-5 md:px-8">
-          <div className="mb-3 text-xs uppercase tracking-[0.2em] text-accent-orange">
-            ★ PRESS KIT
-          </div>
+          <p className="mb-3 text-xs uppercase tracking-[0.2em] text-accent-orange">
+            <span aria-hidden="true">★ </span>PRESS KIT
+          </p>
           <h1 className="font-display text-4xl uppercase leading-[0.95] md:text-6xl">
             Dossier de <span className="text-gradient">prensa</span>
           </h1>
@@ -121,7 +131,7 @@ export default function PressKitPage() {
                   download
                   className="card-lift flex items-center gap-3 rounded-xl border border-border-dark bg-dark-secondary px-5 py-4 text-sm transition-colors hover:border-accent-red/50"
                 >
-                  <Download size={16} className="shrink-0 text-accent-orange" />
+                  <Download size={16} className="shrink-0 text-accent-orange" aria-hidden="true" />
                   {asset.label}
                 </a>
               ))}
@@ -141,7 +151,7 @@ export default function PressKitPage() {
                 href={`mailto:${site.bookingEmail}`}
                 className="inline-flex items-center gap-2 rounded-full gradient-primary px-7 py-3.5 text-sm font-semibold text-white shadow-glow transition-transform hover:scale-105"
               >
-                <Mail size={16} />
+                <Mail size={16} aria-hidden="true" />
                 {site.bookingEmail}
               </a>
               <Link
@@ -158,7 +168,7 @@ export default function PressKitPage() {
               href="/"
               className="inline-flex items-center gap-2 text-sm text-accent-orange hover:underline"
             >
-              ← Volver a la portada
+              <span aria-hidden="true">←</span> Volver a la portada
             </Link>
           </div>
         </div>

@@ -1,89 +1,89 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Send, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
+import { useEffect, useState, useTransition } from "react";
+import { ChevronDown } from "lucide-react";
 import { submitBooking, type BookingFields } from "@/app/actions/booking";
 import { ConsentCheckbox } from "@/components/ConsentCheckbox";
-
-const inputClass =
-  "w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-text-primary placeholder:text-text-secondary/50 outline-none transition focus:border-accent-red focus:bg-white/8 focus:ring-1 focus:ring-accent-red/40";
-
-const selectClass = inputClass + " appearance-none cursor-pointer";
+import {
+  FormError,
+  FormSuccess,
+  Honeypot,
+  NETWORK_ERROR,
+  Required,
+  RequiredLegend,
+  SubmitButton,
+  field,
+  inputClass,
+  labelClass,
+  selectClass,
+} from "@/components/forms/primitives";
+import { todayIso } from "@/lib/dates";
 
 export function BookingForm() {
   const [isPending, startTransition] = useTransition();
   const [result, setResult] = useState<{ success: boolean; error?: string } | null>(null);
+  // El mínimo del selector de fecha se fija tras montar: calculado en el
+  // render, servidor y cliente verían días distintos (hora del build vs. hora
+  // del visitante) y React avisaría de un hydration mismatch.
+  const [minDate, setMinDate] = useState<string>();
+  useEffect(() => {
+    setMinDate(todayIso());
+  }, []);
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (isPending) return;
     const fd = new FormData(e.currentTarget);
-    const form = e.currentTarget;
 
     const fields: BookingFields = {
-      nombre: fd.get("nombre") as string,
-      email: fd.get("email") as string,
-      telefono: fd.get("telefono") as string,
-      tipoEvento: fd.get("tipoEvento") as string,
-      fecha: fd.get("fecha") as string,
-      ciudad: fd.get("ciudad") as string,
-      aforo: fd.get("aforo") as string,
-      formato: fd.get("formato") as string,
-      mensaje: fd.get("mensaje") as string,
+      nombre: field(fd, "nombre"),
+      email: field(fd, "email"),
+      telefono: field(fd, "telefono"),
+      tipoEvento: field(fd, "tipoEvento"),
+      fecha: field(fd, "fecha"),
+      ciudad: field(fd, "ciudad"),
+      aforo: field(fd, "aforo"),
+      formato: field(fd, "formato"),
+      mensaje: field(fd, "mensaje"),
       consentimiento: fd.get("consentimiento") === "on",
-      web: fd.get("web") as string,
+      web: field(fd, "web"),
     };
 
     startTransition(async () => {
-      const res = await submitBooking(fields);
-      setResult(res);
-      if (res?.success) form.reset();
+      try {
+        setResult(await submitBooking(fields));
+      } catch {
+        // La action ha fallado antes de responder (red caída, 500): sin esto
+        // el usuario se quedaría sin feedback.
+        setResult({ success: false, error: NETWORK_ERROR });
+      }
     });
   }
 
   if (result?.success) {
     return (
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="flex flex-col items-center gap-4 rounded-2xl border border-white/10 bg-white/5 px-8 py-12 text-center"
-      >
-        <CheckCircle size={48} className="text-accent-orange" />
-        <h3 className="font-display text-3xl uppercase text-text-primary">
-          ¡Solicitud enviada!
-        </h3>
-        <p className="max-w-sm text-sm text-text-secondary">
-          Swarthy ha recibido tu mensaje. Te responde en menos de 48h con propuesta y disponibilidad.
-        </p>
-        <button
-          onClick={() => setResult(null)}
-          className="mt-2 text-xs uppercase tracking-widest text-accent-orange hover:underline"
-        >
-          Enviar otra solicitud
-        </button>
-      </motion.div>
+      <FormSuccess
+        title="¡Solicitud enviada!"
+        text="Swarthy ha recibido tu mensaje. Te responde en menos de 48h con propuesta y disponibilidad."
+        resetLabel="Enviar otra solicitud"
+        onReset={() => setResult(null)}
+      />
     );
   }
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="rounded-2xl border border-white/10 bg-white/5 p-6 md:p-8 text-left"
+      className="relative rounded-2xl border border-white/10 bg-white/5 p-6 md:p-8 text-left"
+      aria-label="Solicitud de contratación"
     >
-      {/* honeypot anti-spam: oculto para humanos, los bots lo rellenan */}
-      <input
-        type="text"
-        name="web"
-        tabIndex={-1}
-        autoComplete="off"
-        aria-hidden="true"
-        className="absolute -left-[9999px] h-0 w-0 opacity-0"
-      />
+      <Honeypot />
+      <RequiredLegend />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="booking-nombre" className="text-xs uppercase tracking-widest text-text-secondary">
-            Nombre / Empresa *
+          <label htmlFor="booking-nombre" className={labelClass}>
+            Nombre / Empresa<Required />
           </label>
           <input
             id="booking-nombre"
@@ -98,8 +98,8 @@ export function BookingForm() {
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="booking-email" className="text-xs uppercase tracking-widest text-text-secondary">
-            Email de contacto *
+          <label htmlFor="booking-email" className={labelClass}>
+            Email de contacto<Required />
           </label>
           <input
             id="booking-email"
@@ -114,7 +114,7 @@ export function BookingForm() {
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="booking-telefono" className="text-xs uppercase tracking-widest text-text-secondary">
+          <label htmlFor="booking-telefono" className={labelClass}>
             Teléfono / WhatsApp
           </label>
           <input
@@ -128,64 +128,49 @@ export function BookingForm() {
           />
         </div>
 
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="booking-aforo" className="text-xs uppercase tracking-widest text-text-secondary">
-            Aforo estimado
-          </label>
-          <select id="booking-aforo" name="aforo" defaultValue="" className={selectClass}>
-            <option value="">Selecciona…</option>
-            <option value="Menos de 150">Menos de 150</option>
-            <option value="150 - 300">150 — 300</option>
-            <option value="300 - 600">300 — 600</option>
-            <option value="600 - 1.000">600 — 1.000</option>
-            <option value="Más de 1.000">Más de 1.000</option>
-          </select>
-        </div>
+        <SelectField id="booking-aforo" name="aforo" label="Aforo estimado">
+          <option value="">Selecciona…</option>
+          <option value="Menos de 150">Menos de 150</option>
+          <option value="150 - 300">150 — 300</option>
+          <option value="300 - 600">300 — 600</option>
+          <option value="600 - 1.000">600 — 1.000</option>
+          <option value="Más de 1.000">Más de 1.000</option>
+        </SelectField>
+
+        <SelectField id="booking-tipo" name="tipoEvento" label="Tipo de evento" required>
+          <option value="" disabled>Selecciona…</option>
+          <option value="Club / Discoteca">Club / Discoteca</option>
+          <option value="Festival">Festival</option>
+          <option value="Evento privado">Evento privado</option>
+          <option value="Boda">Boda</option>
+          <option value="Evento corporativo">Evento corporativo</option>
+          <option value="Otro">Otro</option>
+        </SelectField>
+
+        <SelectField id="booking-formato" name="formato" label="Formato de set" required>
+          <option value="" disabled>Selecciona…</option>
+          <option value="Set Club (90-120 min)">Set Club — 90/120 min</option>
+          <option value="Peak Time (2-3h)">Peak Time — 2/3h</option>
+          <option value="All Night Long (5-7h)">All Night Long — 5/7h</option>
+        </SelectField>
 
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="booking-tipo" className="text-xs uppercase tracking-widest text-text-secondary">
-            Tipo de evento *
-          </label>
-          <select id="booking-tipo" name="tipoEvento" required defaultValue="" className={selectClass}>
-            <option value="" disabled>Selecciona…</option>
-            <option value="Club / Discoteca">Club / Discoteca</option>
-            <option value="Festival">Festival</option>
-            <option value="Evento privado">Evento privado</option>
-            <option value="Boda">Boda</option>
-            <option value="Evento corporativo">Evento corporativo</option>
-            <option value="Otro">Otro</option>
-          </select>
-        </div>
-
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="booking-formato" className="text-xs uppercase tracking-widest text-text-secondary">
-            Formato de set *
-          </label>
-          <select id="booking-formato" name="formato" required defaultValue="" className={selectClass}>
-            <option value="" disabled>Selecciona…</option>
-            <option value="Set Club (90-120 min)">Set Club — 90/120 min</option>
-            <option value="Peak Time (2-3h)">Peak Time — 2/3h</option>
-            <option value="All Night Long (5-7h)">All Night Long — 5/7h</option>
-          </select>
-        </div>
-
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="booking-fecha" className="text-xs uppercase tracking-widest text-text-secondary">
-            Fecha del evento *
+          <label htmlFor="booking-fecha" className={labelClass}>
+            Fecha del evento<Required />
           </label>
           <input
             id="booking-fecha"
             name="fecha"
             type="date"
             required
-            min={new Date().toISOString().split("T")[0]}
+            min={minDate}
             className={inputClass}
           />
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="booking-ciudad" className="text-xs uppercase tracking-widest text-text-secondary">
-            Ciudad *
+          <label htmlFor="booking-ciudad" className={labelClass}>
+            Ciudad<Required />
           </label>
           <input
             id="booking-ciudad"
@@ -193,13 +178,14 @@ export function BookingForm() {
             type="text"
             required
             maxLength={120}
+            autoComplete="address-level2"
             placeholder="Madrid, Barcelona…"
             className={inputClass}
           />
         </div>
 
         <div className="flex flex-col gap-1.5 sm:col-span-2">
-          <label htmlFor="booking-mensaje" className="text-xs uppercase tracking-widest text-text-secondary">
+          <label htmlFor="booking-mensaje" className={labelClass}>
             Mensaje adicional
           </label>
           <textarea
@@ -215,42 +201,48 @@ export function BookingForm() {
 
       <ConsentCheckbox id="booking-consent" />
 
-      <AnimatePresence>
-        {result?.error && (
-          <motion.p
-            initial={{ opacity: 0, y: -4 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            className="mt-4 flex items-center gap-2 text-sm text-red-400"
-          >
-            <AlertCircle size={14} />
-            {result.error}
-          </motion.p>
-        )}
-      </AnimatePresence>
+      <FormError error={result?.error} />
 
-      <button
-        type="submit"
-        disabled={isPending}
-        className="group mt-6 inline-flex w-full items-center justify-center gap-3 gradient-primary px-8 py-4 text-sm font-semibold text-white rounded-full shadow-glow-strong transition-all hover:scale-105 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
-      >
-        {isPending ? (
-          <>
-            <Loader2 size={18} className="animate-spin" />
-            Enviando…
-          </>
-        ) : (
-          <>
-            <Send size={18} />
-            Solicitar fecha
-            <span className="transition-transform group-hover:translate-x-1">→</span>
-          </>
-        )}
-      </button>
+      <SubmitButton pending={isPending} label="Solicitar fecha" />
 
-      <p className="mt-4 text-center text-xs text-text-secondary/60">
+      <p className="mt-4 text-center text-xs text-text-secondary">
         Respuesta en menos de 48h · Sin agencia · Sin intermediarios
       </p>
     </form>
+  );
+}
+
+/** Select con chevron decorativo: `appearance-none` quita la flecha nativa y
+ *  sin ella el control se confunde con un campo de texto. */
+function SelectField({
+  id,
+  name,
+  label,
+  required,
+  children,
+}: {
+  id: string;
+  name: string;
+  label: string;
+  required?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <label htmlFor={id} className={labelClass}>
+        {label}
+        {required && <Required />}
+      </label>
+      <div className="relative">
+        <select id={id} name={name} required={required} defaultValue="" className={selectClass}>
+          {children}
+        </select>
+        <ChevronDown
+          size={16}
+          aria-hidden="true"
+          className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-text-secondary"
+        />
+      </div>
+    </div>
   );
 }

@@ -1,11 +1,13 @@
 # syntax=docker/dockerfile:1.7
 
-FROM node:20-alpine AS base
+# Node 22 LTS: la rama 20 llegó al final de su soporte en abril de 2026.
+# Mantener en sintonía con `node-version` en .github/workflows/ci.yml.
+FROM node:22-alpine AS base
 WORKDIR /app
 RUN apk add --no-cache libc6-compat
 
 FROM base AS deps
-COPY package.json package-lock.json* ./
+COPY package.json package-lock.json ./
 RUN npm ci --no-audit --no-fund
 
 FROM base AS builder
@@ -14,7 +16,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npm run build
 
-FROM node:20-alpine AS runner
+FROM node:22-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production

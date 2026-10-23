@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { NewTabHint } from "@/components/NewTabHint";
 
 /**
  * Casilla de consentimiento RGPD. Es la base legal del tratamiento, así que
@@ -20,12 +21,15 @@ export function ConsentCheckbox({ id }: { id: string }) {
       />
       <span>
         He leído y acepto la{" "}
+        {/* Nueva pestaña a propósito: así no se pierde lo escrito en el formulario. */}
         <Link
           href="/privacidad"
           target="_blank"
+          rel="noopener"
           className="text-accent-orange hover:underline"
         >
           política de privacidad
+          <NewTabHint />
         </Link>
         . Mis datos se usarán únicamente para responder a esta solicitud.
       </span>

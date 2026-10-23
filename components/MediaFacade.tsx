@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Play } from "lucide-react";
 
 /**
@@ -26,15 +26,22 @@ export function MediaFacade({
   children: React.ReactNode;
 }) {
   const [playing, setPlaying] = useState(false);
+  const playerRef = useRef<HTMLDivElement>(null);
 
-  if (playing) return <>{children}</>;
+  // El botón enfocado desaparece al montar el reproductor: se pasa el foco al
+  // iframe para que un usuario de teclado no lo pierda.
+  useEffect(() => {
+    if (playing) playerRef.current?.querySelector("iframe")?.focus();
+  }, [playing]);
+
+  if (playing) return <div ref={playerRef}>{children}</div>;
 
   return (
     <button
       type="button"
       onClick={() => setPlaying(true)}
       aria-label={`Reproducir ${title}`}
-      className={`group relative block w-full overflow-hidden ${
+      className={`group relative block w-full overflow-hidden focus-visible:outline-offset-[-3px] ${
         ratio === "square" ? "aspect-square" : "aspect-video"
       }`}
     >
@@ -60,7 +67,7 @@ export function MediaFacade({
           compact ? "h-12 w-12" : "h-16 w-16"
         }`}
       >
-        <Play size={compact ? 18 : 24} className="ml-0.5 fill-white text-white" />
+        <Play size={compact ? 18 : 24} className="ml-0.5 fill-white text-white" aria-hidden="true" />
       </span>
     </button>
   );

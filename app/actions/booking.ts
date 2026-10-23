@@ -3,10 +3,13 @@
 import {
   EMAIL_REGEX,
   FIELD_LIMITS,
+  cleanField,
+  cleanLine,
   escapeHtml,
   sendTelegramMessage,
 } from "@/lib/telegram";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { isIsoDay, todayIso } from "@/lib/dates";
 
 const RATE_LIMIT = 3;
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
@@ -30,7 +33,12 @@ export type BookingFields = {
 };
 
 export async function submitBooking(fields: BookingFields): Promise<BookingState> {
-  if (fields.web) {
+  // Endpoint público: el payload puede no ser el objeto que declara el tipo.
+  if (!fields || typeof fields !== "object") {
+    return { success: false, error: "Solicitud no válida." };
+  }
+
+  if (typeof fields.web === "string" && fields.web) {
     // Bot detectado: respondemos éxito sin enviar nada
     return { success: true };
   }
@@ -43,15 +51,15 @@ export async function submitBooking(fields: BookingFields): Promise<BookingState
     };
   }
 
-  const nombre = fields.nombre?.trim().slice(0, FIELD_LIMITS.short);
-  const email = fields.email?.trim().slice(0, FIELD_LIMITS.email);
-  const telefono = fields.telefono?.trim().slice(0, FIELD_LIMITS.short);
-  const tipoEvento = fields.tipoEvento?.trim().slice(0, FIELD_LIMITS.short);
-  const fecha = fields.fecha?.trim().slice(0, FIELD_LIMITS.short);
-  const ciudad = fields.ciudad?.trim().slice(0, FIELD_LIMITS.short);
-  const aforo = fields.aforo?.trim().slice(0, FIELD_LIMITS.short);
-  const formato = fields.formato?.trim().slice(0, FIELD_LIMITS.short);
-  const mensaje = fields.mensaje?.trim().slice(0, FIELD_LIMITS.message);
+  const nombre = cleanLine(fields.nombre, FIELD_LIMITS.short);
+  const email = cleanLine(fields.email, FIELD_LIMITS.email);
+  const telefono = cleanLine(fields.telefono, FIELD_LIMITS.short);
+  const tipoEvento = cleanLine(fields.tipoEvento, FIELD_LIMITS.short);
+  const fecha = cleanLine(fields.fecha, FIELD_LIMITS.short);
+  const ciudad = cleanLine(fields.ciudad, FIELD_LIMITS.short);
+  const aforo = cleanLine(fields.aforo, FIELD_LIMITS.short);
+  const formato = cleanLine(fields.formato, FIELD_LIMITS.short);
+  const mensaje = cleanField(fields.mensaje, FIELD_LIMITS.message);
 
   if (!nombre || !email || !tipoEvento || !fecha || !ciudad || !formato) {
     return { success: false, error: "Completa todos los campos obligatorios." };
@@ -61,9 +69,15 @@ export async function submitBooking(fields: BookingFields): Promise<BookingState
     return { success: false, error: "El email no tiene un formato válido." };
   }
 
+  // El <input type="date"> ya limita en cliente, pero un envío programático
+  // podría mandar cualquier cosa: se exige un día ISO real y no pasado.
+  if (!isIsoDay(fecha) || fecha < todayIso()) {
+    return { success: false, error: "La fecha del evento no es válida." };
+  }
+
   // Se revalida en servidor: la casilla del formulario es la base legal del
   // tratamiento y un envío programático podría saltársela.
-  if (!fields.consentimiento) {
+  if (fields.consentimiento !== true) {
     return {
       success: false,
       error: "Necesitamos tu consentimiento para tratar los datos del formulario.",

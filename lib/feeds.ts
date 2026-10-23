@@ -2,6 +2,25 @@ const YT_CHANNEL_ID = "UCssrEHx7wZR0jvlABi46TNQ";
 const YT_HANDLE = "swarthy_dj";
 const SC_USER_ID = "1764128";
 
+// Un upstream colgado bloquearía la regeneración ISR de la home (page.tsx
+// espera a los cuatro feeds) y, en el build, lo tumbaría entero.
+const FEED_TIMEOUT_MS = 8_000;
+// Cota al cuerpo que se parsea: las páginas de canal de YouTube pesan ~1 MB
+// y no hay motivo para procesar respuestas mucho mayores.
+const MAX_BODY_CHARS = 3_000_000;
+// Cuántos elementos por plataforma devuelve cada feed. Mixes pinta como
+// mucho 1 destacado + 6 secundarios en total, así que serializar 30 vídeos
+// en el payload RSC sería peso muerto en el HTML.
+export const FEED_LIMIT = 8;
+
+// Identificadores tal y como los define cada plataforma. Se validan antes de
+// interpolarlos en la URL del iframe para que un feed manipulado no pueda
+// alterar la ruta del embed.
+const YT_VIDEO_ID = /^[\w-]{11}$/;
+const SC_TRACK_ID = /^\d+$/;
+const SC_TRACK_URL = /^https:\/\/(soundcloud\.com|on\.soundcloud\.com)\//;
+const SC_ARTWORK_URL = /^https:\/\/[a-z0-9-]+\.sndcdn\.com\//;
+
 // YouTube limita (429/403) las peticiones de RSS desde IPs de datacenter
 // cuando no llevan un User-Agent de navegador. Sin esto el feed llega vacío
 // en producción y la sección cae al enlace de fallback.
@@ -50,10 +69,14 @@ async function getYouTubeVideosFromRss(): Promise<VideoItem[]> {
   try {
     const res = await fetch(
       `https://www.youtube.com/feeds/videos.xml?channel_id=${YT_CHANNEL_ID}`,
-      { headers: FEED_HEADERS, next: { revalidate: 3600 } }
+      {
+        headers: FEED_HEADERS,
+        next: { revalidate: 3600 },
+        signal: AbortSignal.timeout(FEED_TIMEOUT_MS),
+      }
     );
     if (!res.ok) return [];
-    const xml = await res.text();
+    const xml = (await res.text()).slice(0, MAX_BODY_CHARS);
 
     const entryRegex = /<entry>([\s\S]*?)<\/entry>/g;
     const videos: VideoItem[] = [];
@@ -67,11 +90,12 @@ async function getYouTubeVideosFromRss(): Promise<VideoItem[]> {
       const pubMatch = entry.match(/<published>([^<]+)<\/published>/);
       const thumbMatch = entry.match(/<media:thumbnail[^>]+url="([^"]+)"/);
 
-      if (!idMatch) continue;
+      if (!idMatch || !YT_VIDEO_ID.test(idMatch[1])) continue;
 
       const id = idMatch[1];
-      const url = linkMatch?.[1] ?? "";
-      const isShort = url.includes("/shorts/");
+      const url = `https://www.youtube.com/watch?v=${id}`;
+      const feedUrl = linkMatch?.[1] ?? "";
+      const isShort = feedUrl.includes("/shorts/");
 
       videos.push({
         id,
@@ -83,7 +107,7 @@ async function getYouTubeVideosFromRss(): Promise<VideoItem[]> {
       });
     }
 
-    return videos;
+    return videos.slice(0, FEED_LIMIT);
   } catch {
     return [];
   }
@@ -107,10 +131,11 @@ async function getYouTubeVideosFromChannelPage(): Promise<VideoItem[]> {
         Cookie: "SOCS=CAI; CONSENT=YES+cb",
       },
       next: { revalidate: 3600 },
+      signal: AbortSignal.timeout(FEED_TIMEOUT_MS),
     });
     if (!res.ok) return [];
 
-    const html = await res.text();
+    const html = (await res.text()).slice(0, MAX_BODY_CHARS);
     const match = html.match(/var ytInitialData = (\{[\s\S]*?\});<\/script>/);
     if (!match) return [];
 
@@ -119,7 +144,7 @@ async function getYouTubeVideosFromChannelPage(): Promise<VideoItem[]> {
 
     for (const lockup of collectLockups(JSON.parse(match[1]))) {
       const id = lockup.contentId;
-      if (!id || seen.has(id)) continue;
+      if (!id || !YT_VIDEO_ID.test(id) || seen.has(id)) continue;
       seen.add(id);
 
       const meta = lockup.metadata?.lockupMetadataViewModel;
@@ -142,6 +167,7 @@ async function getYouTubeVideosFromChannelPage(): Promise<VideoItem[]> {
         // La pestaña /videos no incluye shorts: tienen su propia pestaña.
         isShort: false,
       });
+      if (videos.length >= FEED_LIMIT) break;
     }
 
     return videos;
@@ -196,10 +222,14 @@ export async function getLatestSoundCloudTracks(): Promise<TrackItem[]> {
   try {
     const res = await fetch(
       `https://feeds.soundcloud.com/users/soundcloud:users:${SC_USER_ID}/sounds.rss`,
-      { headers: FEED_HEADERS, next: { revalidate: 3600 } }
+      {
+        headers: FEED_HEADERS,
+        next: { revalidate: 3600 },
+        signal: AbortSignal.timeout(FEED_TIMEOUT_MS),
+      }
     );
     if (!res.ok) return [];
-    const xml = await res.text();
+    const xml = (await res.text()).slice(0, MAX_BODY_CHARS);
 
     const itemRegex = /<item>([\s\S]*?)<\/item>/g;
     const tracks: TrackItem[] = [];
@@ -216,15 +246,20 @@ export async function getLatestSoundCloudTracks(): Promise<TrackItem[]> {
       if (!titleMatch) continue;
 
       const guid = guidMatch?.[1] ?? "";
-      const idMatch = guid.match(/tracks\/(\d+)/);
+      const id = guid.match(/tracks\/(\d+)/)?.[1] ?? "";
+      if (!SC_TRACK_ID.test(id)) continue;
+
+      const url = linkMatch?.[1]?.trim() ?? "";
+      const artwork = artworkMatch?.[1];
 
       tracks.push({
-        id: idMatch?.[1] ?? "",
-        title: titleMatch[1].trim(),
-        url: linkMatch?.[1]?.trim() ?? "",
+        id,
+        title: decodeHtmlEntities(titleMatch[1].trim()),
+        url: SC_TRACK_URL.test(url) ? url : `https://soundcloud.com/dj_swarthy`,
         publishedAt: dateMatch?.[1]?.trim() ?? "",
-        artwork: artworkMatch?.[1],
+        artwork: artwork && SC_ARTWORK_URL.test(artwork) ? artwork : undefined,
       });
+      if (tracks.length >= FEED_LIMIT) break;
     }
 
     return tracks;

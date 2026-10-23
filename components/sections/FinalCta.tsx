@@ -1,7 +1,7 @@
-"use client";
-
-import { motion } from "framer-motion";
 import { Clock, MapPin, MessageCircle } from "lucide-react";
+import { Reveal } from "@/components/motion/Reveal";
+import { Overline } from "@/components/Overline";
+import { NewTabHint } from "@/components/NewTabHint";
 import { BookingForm } from "./BookingForm";
 import { site } from "@/lib/data";
 
@@ -17,16 +17,8 @@ export function FinalCta() {
       />
 
       <div className="relative mx-auto max-w-2xl px-5 md:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.7 }}
-          className="text-center mb-10"
-        >
-          <div className="mb-3 text-xs uppercase tracking-[0.2em] text-accent-orange">
-            ★ ¿LISTO?
-          </div>
+        <Reveal y={24} duration={0.7} margin="-100px" className="text-center mb-10">
+          <Overline>¿LISTO?</Overline>
           <h2 className="font-display text-5xl uppercase leading-[0.95] md:text-7xl">
             Reserva una{" "}
             <span className="text-gradient">noche</span>
@@ -39,11 +31,11 @@ export function FinalCta() {
 
           <div className="mt-4 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs uppercase tracking-[0.15em] text-text-secondary">
             <span className="inline-flex items-center gap-1.5">
-              <Clock size={12} className="text-accent-orange" />
+              <Clock size={12} className="text-accent-orange" aria-hidden="true" />
               Respuesta en 48h
             </span>
             <span className="inline-flex items-center gap-1.5">
-              <MapPin size={12} className="text-accent-orange" />
+              <MapPin size={12} className="text-accent-orange" aria-hidden="true" />
               Madrid · Toda España
             </span>
           </div>
@@ -59,20 +51,16 @@ export function FinalCta() {
               rel="noopener noreferrer"
               className="mt-6 inline-flex items-center gap-2 rounded-full border border-border-dark bg-dark-secondary px-6 py-3 text-sm font-semibold text-text-primary transition-colors hover:border-accent-red/50"
             >
-              <MessageCircle size={16} className="text-accent-orange" />
+              <MessageCircle size={16} className="text-accent-orange" aria-hidden="true" />
               O escríbele por WhatsApp
+              <NewTabHint />
             </a>
           )}
-        </motion.div>
+        </Reveal>
 
-        <motion.div
-          initial={{ opacity: 0, y: 32 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.7, delay: 0.15 }}
-        >
+        <Reveal y={32} duration={0.7} delay={0.15} margin="-80px">
           <BookingForm />
-        </motion.div>
+        </Reveal>
       </div>
     </section>
   );

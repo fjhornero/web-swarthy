@@ -1,7 +1,6 @@
-"use client";
-
-import { motion } from "framer-motion";
 import { Quote } from "lucide-react";
+import { Reveal } from "@/components/motion/Reveal";
+import { SectionHeading } from "@/components/SectionHeading";
 import { site } from "@/lib/data";
 
 export function Testimonials() {
@@ -12,26 +11,25 @@ export function Testimonials() {
   return (
     <section id="testimonios" className="relative bg-dark-secondary py-20 md:py-28">
       <div className="mx-auto max-w-6xl px-5 md:px-8">
-        <div className="mb-14 text-center">
-          <div className="mb-3 text-xs uppercase tracking-[0.2em] text-accent-orange">
-            ★ LO QUE DICEN
-          </div>
-          <h2 className="font-display text-4xl uppercase md:text-6xl">
-            Promotores que <span className="text-gradient">repiten</span>
-          </h2>
-        </div>
+        <SectionHeading
+          overline="LO QUE DICEN"
+          title={
+            <>
+              Promotores que <span className="text-gradient">repiten</span>
+            </>
+          }
+        />
 
         <div className="grid gap-5 md:grid-cols-3">
           {site.testimonials.map((t, i) => (
-            <motion.figure
+            <Reveal
+              as="figure"
               key={t.author + t.role}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.5, delay: i * 0.08 }}
+              delay={i * 0.08}
+              y={20}
               className="card-lift flex h-full flex-col rounded-2xl border border-border-dark bg-dark-primary p-6"
             >
-              <Quote size={22} className="mb-4 shrink-0 text-accent-orange" />
+              <Quote size={22} className="mb-4 shrink-0 text-accent-orange" aria-hidden="true" />
               <blockquote className="flex-1 text-base leading-relaxed text-text-secondary">
                 “{t.quote}”
               </blockquote>
@@ -43,7 +41,7 @@ export function Testimonials() {
                   {t.role}
                 </span>
               </figcaption>
-            </motion.figure>
+            </Reveal>
           ))}
         </div>
       </div>
