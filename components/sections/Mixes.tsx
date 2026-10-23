@@ -5,13 +5,14 @@ import { Reveal } from "@/components/motion/Reveal";
 import { SectionHeading } from "@/components/SectionHeading";
 import { NewTabHint } from "@/components/NewTabHint";
 import type { VideoItem, TrackItem } from "@/lib/feeds";
+import { splitMixes, type MixEntry } from "@/lib/mixes";
 
 interface MixesProps {
   videos: VideoItem[];
   tracks: TrackItem[];
 }
 
-// Cuántos elementos extra se listan bajo los dos destacados.
+// Cuántos elementos se listan en cada rejilla bajo los destacados.
 const SECONDARY_LIMIT = 6;
 
 // Las fechas llegan en formatos distintos (YouTube en ISO 8601, SoundCloud en
@@ -34,18 +35,9 @@ function formatDate(raw: string, fallbackLabel?: string): string {
 }
 
 export function Mixes({ videos, tracks }: MixesProps) {
-  const [featuredVideo, ...restVideos] = videos.filter((v) => !v.isShort);
-  const [featuredTrack, ...restTracks] = tracks.filter((t) => t.id);
-
-  // Intercalamos vídeo/track para que la rejilla secundaria no quede agrupada
-  // por plataforma cuando una de las dos tiene mucho más material.
-  const secondary: Array<
-    { kind: "video"; item: VideoItem } | { kind: "track"; item: TrackItem }
-  > = [];
-  for (let i = 0; i < Math.max(restVideos.length, restTracks.length); i++) {
-    if (restVideos[i]) secondary.push({ kind: "video", item: restVideos[i] });
-    if (restTracks[i]) secondary.push({ kind: "track", item: restTracks[i] });
-  }
+  // Los destacados son siempre sets: el CTA del hero promete "último set" y
+  // un promotor que llega aquí quiere oír cómo pincha, no una producción.
+  const { featured, sets, productions } = splitMixes(videos, tracks);
 
   return (
     <section id="mixes" className="relative bg-dark-secondary py-20 md:py-28">
@@ -59,92 +51,105 @@ export function Mixes({ videos, tracks }: MixesProps) {
           }
         />
 
-        <div className="grid gap-8 md:grid-cols-2">
-          <PlatformCard
-            icon={<Youtube size={18} className="text-accent-orange" aria-hidden="true" />}
-            label="YouTube"
-            delay={0}
-          >
-            {featuredVideo ? (
-              <>
-                <YouTubeFacade video={featuredVideo} />
-                <MediaMeta
-                  title={featuredVideo.title}
-                  date={featuredVideo.publishedAt}
-                  dateLabel={featuredVideo.publishedLabel}
-                  href={featuredVideo.url}
-                  linkLabel="Ver en YouTube"
-                />
-              </>
-            ) : (
+        {featured.length > 0 ? (
+          <div className={`grid gap-8 ${featured.length > 1 ? "md:grid-cols-2" : ""}`}>
+            {featured.map((entry, i) => (
+              <FeaturedCard key={entry.kind + entry.item.id} entry={entry} delay={i * 0.1} />
+            ))}
+          </div>
+        ) : (
+          <div className="grid gap-8 md:grid-cols-2">
+            <PlatformCard icon={YOUTUBE_ICON} label="YouTube" delay={0}>
               <FallbackCard
                 href="https://www.youtube.com/@swarthy_dj"
                 label="Ver canal de YouTube"
               />
-            )}
-          </PlatformCard>
-
-          <PlatformCard
-            icon={<Music size={18} className="text-accent-orange" aria-hidden="true" />}
-            label="SoundCloud"
-            delay={0.1}
-          >
-            {featuredTrack ? (
-              <>
-                <SoundCloudFacade track={featuredTrack} />
-                <MediaMeta
-                  title={featuredTrack.title}
-                  date={featuredTrack.publishedAt}
-                  href={featuredTrack.url}
-                  linkLabel="Escuchar en SoundCloud"
-                />
-              </>
-            ) : (
+            </PlatformCard>
+            <PlatformCard icon={SOUNDCLOUD_ICON} label="SoundCloud" delay={0.1}>
               <FallbackCard
                 href="https://soundcloud.com/dj_swarthy"
                 label="Ver perfil de SoundCloud"
               />
-            )}
-          </PlatformCard>
-        </div>
-
-        {secondary.length > 0 && (
-          <div className="mt-14">
-            <h3 className="mb-6 text-xs uppercase tracking-[0.2em] text-text-secondary">
-              Más sesiones
-            </h3>
-            <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {secondary.slice(0, SECONDARY_LIMIT).map((entry, i) => (
-                <Reveal
-                  as="li"
-                  key={entry.kind + entry.item.id}
-                  y={20}
-                  delay={(i % 3) * 0.07}
-                  className="overflow-hidden rounded-2xl border border-border-dark bg-dark-primary"
-                >
-                  {entry.kind === "video" ? (
-                    <YouTubeFacade video={entry.item} compact />
-                  ) : (
-                    <SoundCloudFacade track={entry.item} compact />
-                  )}
-                  <div className="p-4">
-                    <p className="line-clamp-2 text-sm font-medium leading-snug">
-                      {entry.item.title}
-                    </p>
-                    <span className="mt-2 block text-xs text-text-secondary">
-                      {formatDate(
-                        entry.item.publishedAt,
-                        entry.kind === "video" ? entry.item.publishedLabel : undefined
-                      )}
-                    </span>
-                  </div>
-                </Reveal>
-              ))}
-            </ul>
+            </PlatformCard>
           </div>
         )}
+
+        <MixGrid heading="Más sesiones" entries={sets} />
+        <MixGrid heading="Producciones y versiones" entries={productions} />
       </div>
     </section>
+  );
+}
+
+const YOUTUBE_ICON = <Youtube size={18} className="text-accent-orange" aria-hidden="true" />;
+const SOUNDCLOUD_ICON = <Music size={18} className="text-accent-orange" aria-hidden="true" />;
+
+function FeaturedCard({ entry, delay }: { entry: MixEntry; delay: number }) {
+  if (entry.kind === "video") {
+    const video = entry.item;
+    return (
+      <PlatformCard icon={YOUTUBE_ICON} label="YouTube" delay={delay}>
+        <YouTubeFacade video={video} />
+        <MediaMeta
+          title={video.title}
+          date={video.publishedAt}
+          dateLabel={video.publishedLabel}
+          href={video.url}
+          linkLabel="Ver en YouTube"
+        />
+      </PlatformCard>
+    );
+  }
+  const track = entry.item;
+  return (
+    <PlatformCard icon={SOUNDCLOUD_ICON} label="SoundCloud" delay={delay}>
+      <SoundCloudFacade track={track} />
+      <MediaMeta
+        title={track.title}
+        date={track.publishedAt}
+        href={track.url}
+        linkLabel="Escuchar en SoundCloud"
+      />
+    </PlatformCard>
+  );
+}
+
+function MixGrid({ heading, entries }: { heading: string; entries: MixEntry[] }) {
+  if (entries.length === 0) return null;
+  return (
+    <div className="mt-14">
+      <h3 className="mb-6 text-xs uppercase tracking-[0.2em] text-text-secondary">
+        {heading}
+      </h3>
+      <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {entries.slice(0, SECONDARY_LIMIT).map((entry, i) => (
+          <Reveal
+            as="li"
+            key={entry.kind + entry.item.id}
+            y={20}
+            delay={(i % 3) * 0.07}
+            className="overflow-hidden rounded-2xl border border-border-dark bg-dark-primary"
+          >
+            {entry.kind === "video" ? (
+              <YouTubeFacade video={entry.item} compact />
+            ) : (
+              <SoundCloudFacade track={entry.item} compact />
+            )}
+            <div className="p-4">
+              <p className="line-clamp-2 text-sm font-medium leading-snug">
+                {entry.item.title}
+              </p>
+              <span className="mt-2 block text-xs text-text-secondary">
+                {formatDate(
+                  entry.item.publishedAt,
+                  entry.kind === "video" ? entry.item.publishedLabel : undefined
+                )}
+              </span>
+            </div>
+          </Reveal>
+        ))}
+      </ul>
+    </div>
   );
 }
 

@@ -8,10 +8,30 @@ export function StickyCta() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setVisible(window.scrollY > window.innerHeight * 0.6);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    // Se oculta mientras los formularios o el pie están en pantalla: encima de
+    // #booking tapaba el consentimiento y el botón de enviar, y en Android
+    // subía con el teclado sobre el campo activo.
+    const covered = new Set<Element>();
+    const update = () =>
+      setVisible(window.scrollY > window.innerHeight * 0.6 && covered.size === 0);
+
+    const observer = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) covered.add(entry.target);
+        else covered.delete(entry.target);
+      }
+      update();
+    });
+    document
+      .querySelectorAll("#booking, #contacto, footer")
+      .forEach((el) => observer.observe(el));
+
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("scroll", update);
+    };
   }, []);
 
   return (
