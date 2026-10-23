@@ -24,7 +24,14 @@ export type BookingFields = {
   fecha: string;
   ciudad: string;
   aforo?: string;
-  formato: string;
+  /** Sala o nombre del evento */
+  sala?: string;
+  /** Warm-up, peak, cierre… */
+  franja?: string;
+  /** Texto libre: los tramos de cachet aún no están fijados */
+  presupuesto?: string;
+  /** Opcional: un cliente de boda no tiene por qué conocer los formatos de club */
+  formato?: string;
   mensaje: string;
   // Consentimiento RGPD: es la base legal del tratamiento, obligatorio
   consentimiento: boolean;
@@ -58,10 +65,13 @@ export async function submitBooking(fields: BookingFields): Promise<BookingState
   const fecha = cleanLine(fields.fecha, FIELD_LIMITS.short);
   const ciudad = cleanLine(fields.ciudad, FIELD_LIMITS.short);
   const aforo = cleanLine(fields.aforo, FIELD_LIMITS.short);
+  const sala = cleanLine(fields.sala, FIELD_LIMITS.short);
+  const franja = cleanLine(fields.franja, FIELD_LIMITS.short);
+  const presupuesto = cleanLine(fields.presupuesto, FIELD_LIMITS.short);
   const formato = cleanLine(fields.formato, FIELD_LIMITS.short);
   const mensaje = cleanField(fields.mensaje, FIELD_LIMITS.message);
 
-  if (!nombre || !email || !tipoEvento || !fecha || !ciudad || !formato) {
+  if (!nombre || !email || !tipoEvento || !fecha || !ciudad) {
     return { success: false, error: "Completa todos los campos obligatorios." };
   }
 
@@ -93,8 +103,11 @@ export async function submitBooking(fields: BookingFields): Promise<BookingState
     `🎪 <b>Tipo:</b> ${escapeHtml(tipoEvento)}`,
     `📅 <b>Fecha:</b> ${escapeHtml(fecha)}`,
     `📍 <b>Ciudad:</b> ${escapeHtml(ciudad)}`,
+    ...(sala ? [`🏛 <b>Sala / evento:</b> ${escapeHtml(sala)}`] : []),
+    ...(franja ? [`🕐 <b>Franja:</b> ${escapeHtml(franja)}`] : []),
     ...(aforo ? [`👥 <b>Aforo:</b> ${escapeHtml(aforo)}`] : []),
-    `🎧 <b>Formato:</b> ${escapeHtml(formato)}`,
+    `🎧 <b>Formato:</b> ${escapeHtml(formato || "Sin preferencia")}`,
+    ...(presupuesto ? [`💶 <b>Presupuesto:</b> ${escapeHtml(presupuesto)}`] : []),
     ...(mensaje ? [`💬 <b>Mensaje:</b> ${escapeHtml(mensaje)}`] : []),
     "",
     `📩 Responder a: ${escapeHtml(email)}`,

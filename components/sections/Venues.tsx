@@ -8,10 +8,10 @@ export function Venues() {
     <section id="venues" className="relative bg-dark-primary py-20 md:py-28">
       <div className="mx-auto max-w-6xl px-5 md:px-8">
         <SectionHeading
-          overline="DONDE HA PINCHADO"
+          overline="TRAYECTORIA"
           title={
             <>
-              Clubs y festivales que <span className="text-gradient">confían</span>
+              Salas donde ha <span className="text-gradient">pinchado</span>
             </>
           }
         />
@@ -23,7 +23,7 @@ export function Venues() {
               key={v.name + v.year}
               delay={i * 0.07}
               y={20}
-              className="card-lift relative aspect-video overflow-hidden rounded-2xl border border-border-dark group"
+              className="relative aspect-video overflow-hidden rounded-2xl border border-border-dark"
             >
               {v.img ? (
                 <>
@@ -33,7 +33,7 @@ export function Venues() {
                     src={v.img}
                     alt=""
                     fill
-                    className="object-cover saturate-[0.55] brightness-90 transition-all duration-700 group-hover:scale-105 group-hover:saturate-100 group-hover:brightness-100"
+                    className="object-cover saturate-[0.55] brightness-90"
                     sizes="(max-width: 768px) 100vw, 33vw"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />

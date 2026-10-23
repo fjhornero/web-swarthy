@@ -69,7 +69,7 @@ export function MediaFacade({
       )}
       <div className="absolute inset-0 bg-black/30 transition-colors group-hover:bg-black/15" />
       <span
-        className={`absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full gradient-primary shadow-glow-strong transition-transform group-hover:scale-110 ${
+        className={`absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-white/30 bg-black/40 backdrop-blur-sm transition-[transform,background-color] group-hover:scale-110 group-hover:bg-accent-red ${
           compact ? "h-12 w-12" : "h-16 w-16"
         }`}
       >

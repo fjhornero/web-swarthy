@@ -47,19 +47,23 @@ export default async function Home() {
     <>
       <Navbar />
       <main id="main-content">
+        {/* Orden del embudo del promotor: escuchar y ver dónde ha pinchado,
+            entender qué compra, resolver dudas y pedir fecha. El formulario
+            genérico va detrás del de booking para que nadie lo use para
+            contratar (no recoge fecha ni ciudad). */}
         <Hero />
         <Stats />
-        <About />
         <Dates dates={dates} />
-        <Mixes videos={ytVideos} tracks={scTracks} />
-        <Releases releases={spotifyReleases} artist={spotifyArtist} />
-        <Formats />
         <Venues />
+        <Mixes videos={ytVideos} tracks={scTracks} />
+        <Formats />
+        <About />
+        <Releases releases={spotifyReleases} artist={spotifyArtist} />
         <Testimonials />
-        <Socials />
         <Faq />
-        <Contact />
         <FinalCta />
+        <Contact />
+        <Socials />
       </main>
       <Footer />
       <StickyCta />

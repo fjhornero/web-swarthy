@@ -57,7 +57,7 @@ export function SpotifyProfilePlayer({ artist }: { artist: SpotifyArtistCard | n
         <button
           type="button"
           onClick={() => setPlaying(true)}
-          className="mt-5 inline-flex items-center gap-2 rounded-full gradient-primary px-6 py-3 text-sm font-semibold text-white shadow-glow transition-transform hover:scale-105"
+          className="mt-5 inline-flex items-center gap-2 rounded-full border border-border-dark bg-dark-primary px-6 py-3 text-sm font-semibold text-text-primary transition-colors hover:bg-dark-secondary"
         >
           <Play size={16} className="fill-white text-white" aria-hidden="true" />
           Escuchar ahora

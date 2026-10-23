@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { CalendarCheck, Play } from "lucide-react";
 import { site } from "@/lib/data";
@@ -17,6 +18,22 @@ export function Hero() {
         aria-hidden
         className="pointer-events-none absolute -top-1/3 left-1/2 -translate-x-1/2 w-[120vw] h-[120vw] max-w-[1400px] max-h-[1400px] gradient-glow"
       />
+
+      {/* La cara del artista en el primer pantallazo, como fondo que se funde
+          con el negro para no competir con el titular: arriba en móvil, a la
+          derecha en escritorio. Decorativa: el retrato con alt está en About. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-y-0 right-0 w-full opacity-25 [mask-image:linear-gradient(to_bottom,black_25%,transparent_75%)] md:w-1/2 md:opacity-40 md:[mask-image:linear-gradient(to_left,black_30%,transparent)]"
+      >
+        <Image
+          src="/images/portrait-bw.webp"
+          alt=""
+          fill
+          className="object-cover object-top"
+          sizes="(max-width: 768px) 100vw, 50vw"
+        />
+      </div>
 
       <div className="relative mx-auto max-w-5xl px-5 text-center md:px-8">
         {/* overline */}

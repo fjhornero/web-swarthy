@@ -8,11 +8,11 @@ import { Menu, X } from "lucide-react";
 // Rutas absolutas ("/#about" y no "#about"): la barra también se renderiza en
 // /press-kit y /privacidad, donde un ancla relativa no apunta a nada.
 const links = [
-  { href: "/#about", label: "Sobre Swarthy" },
-  { href: "/#mixes", label: "Sets" },
-  { href: "/#spotify", label: "Música" },
-  { href: "/#formats", label: "Formatos" },
   { href: "/#venues", label: "Clubs" },
+  { href: "/#mixes", label: "Sets" },
+  { href: "/#formats", label: "Formatos" },
+  { href: "/#about", label: "Sobre Swarthy" },
+  { href: "/#spotify", label: "Música" },
   { href: "/#faq", label: "FAQ" },
   { href: "/#contacto", label: "Contacto" },
 ];

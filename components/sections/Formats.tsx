@@ -42,7 +42,7 @@ export function Formats() {
             >
               {f.featured && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full gradient-primary text-xs font-bold uppercase tracking-wider text-white">
-                  Más popular
+                  Recomendado para club
                 </div>
               )}
 
@@ -50,9 +50,7 @@ export function Formats() {
                 {f.name}
               </h3>
               <div
-                className={`mt-4 font-display text-4xl md:text-5xl ${
-                  f.featured ? "text-gradient" : "text-text-primary"
-                }`}
+                className="mt-4 font-display text-4xl text-text-primary md:text-5xl"
               >
                 {f.duration}
               </div>

@@ -52,7 +52,7 @@ export function Dates({ dates }: DatesProps) {
                   dateTime={gig.date}
                   className="flex shrink-0 items-baseline gap-2 sm:w-24 sm:flex-col sm:items-center sm:gap-0"
                 >
-                  <span className="font-display text-4xl leading-none text-gradient">
+                  <span className="font-display text-4xl leading-none text-text-primary">
                     {dayFormatter.format(d)}
                   </span>
                   <span className="text-xs uppercase tracking-[0.2em] text-text-secondary">
