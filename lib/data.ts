@@ -124,7 +124,8 @@ export const site = {
     // Sin foto de sala: cae al tratamiento tipográfico en vez de usar una
     // imagen que desentona con el resto de la rejilla.
     { name: "Keeper", city: "Madrid", country: "ES", year: "2024" },
-    { name: "Samsara", city: "Madrid", country: "ES", year: "2025", img: "/images/venue-samsara.jpg" },
+    // Sin foto: la anterior llevaba el logo de la sala y caras reconocibles de público.
+    { name: "Samsara", city: "Madrid", country: "ES", year: "2025" },
     { name: "Mondo Disko", city: "Madrid", country: "ES", year: "2024", img: "/images/venue-mondo-disko.jpg" },
   ] as Venue[],
 
@@ -141,7 +142,7 @@ export const site = {
       "Llegada 60-90 min antes · sound check de 15-20 min",
     ],
     assets: [
-      { label: "Retrato en alta (WEBP)", href: "/images/portrait-bw.webp" },
+      { label: "Retrato (WEBP · 864×1110 px)", href: "/images/portrait-bw.webp" },
       { label: "Isotipo (PNG)", href: "/logo-isotype.png" },
       { label: "Logotipo completo (PNG)", href: "/logo-wordmark.png" },
     ],

@@ -43,6 +43,9 @@ export function BookingForm() {
       fecha: field(fd, "fecha"),
       ciudad: field(fd, "ciudad"),
       aforo: field(fd, "aforo"),
+      sala: field(fd, "sala"),
+      franja: field(fd, "franja"),
+      presupuesto: field(fd, "presupuesto"),
       formato: field(fd, "formato"),
       mensaje: field(fd, "mensaje"),
       consentimiento: fd.get("consentimiento") === "on",
@@ -81,6 +84,79 @@ export function BookingForm() {
       <RequiredLegend />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        {/* Primero lo que define la fecha (cuándo, dónde, qué) y después quién
+            la pide: es lo que el promotor tiene a mano y lo que decide si hay hueco. */}
+
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="booking-fecha" className={labelClass}>
+            Fecha del evento<Required />
+          </label>
+          <input
+            id="booking-fecha"
+            name="fecha"
+            type="date"
+            required
+            min={minDate}
+            className={inputClass}
+          />
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="booking-ciudad" className={labelClass}>
+            Ciudad<Required />
+          </label>
+          <input
+            id="booking-ciudad"
+            name="ciudad"
+            type="text"
+            required
+            maxLength={120}
+            autoComplete="address-level2"
+            placeholder="Madrid, Barcelona…"
+            className={inputClass}
+          />
+        </div>
+
+        <SelectField id="booking-tipo" name="tipoEvento" label="Tipo de evento" required>
+          <option value="" disabled>Selecciona…</option>
+          <option value="Club / Discoteca">Club / Discoteca</option>
+          <option value="Festival">Festival</option>
+          <option value="Evento privado">Evento privado</option>
+          <option value="Boda">Boda</option>
+          <option value="Evento corporativo">Evento corporativo</option>
+          <option value="Otro">Otro</option>
+        </SelectField>
+
+        <SelectField id="booking-formato" name="formato" label="Formato de set">
+          <option value="">No lo sé, recomiéndame</option>
+          <option value="Set Club (90-120 min)">Set Club — 90/120 min</option>
+          <option value="Peak Time (2-3h)">Peak Time — 2/3h</option>
+          <option value="All Night Long (5-7h)">All Night Long — 5/7h</option>
+        </SelectField>
+
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="booking-sala" className={labelClass}>
+            Sala o nombre del evento
+          </label>
+          <input
+            id="booking-sala"
+            name="sala"
+            type="text"
+            maxLength={120}
+            placeholder="Sala, festival o celebración"
+            className={inputClass}
+          />
+        </div>
+
+        <SelectField id="booking-franja" name="franja" label="Franja del set">
+          <option value="">Selecciona…</option>
+          <option value="Warm-up">Warm-up</option>
+          <option value="Peak time">Peak time</option>
+          <option value="Cierre">Cierre</option>
+          <option value="Toda la noche">Toda la noche</option>
+          <option value="Evento de día">Evento de día</option>
+        </SelectField>
+
         <div className="flex flex-col gap-1.5">
           <label htmlFor="booking-nombre" className={labelClass}>
             Nombre / Empresa<Required />
@@ -137,49 +213,16 @@ export function BookingForm() {
           <option value="Más de 1.000">Más de 1.000</option>
         </SelectField>
 
-        <SelectField id="booking-tipo" name="tipoEvento" label="Tipo de evento" required>
-          <option value="" disabled>Selecciona…</option>
-          <option value="Club / Discoteca">Club / Discoteca</option>
-          <option value="Festival">Festival</option>
-          <option value="Evento privado">Evento privado</option>
-          <option value="Boda">Boda</option>
-          <option value="Evento corporativo">Evento corporativo</option>
-          <option value="Otro">Otro</option>
-        </SelectField>
-
-        <SelectField id="booking-formato" name="formato" label="Formato de set" required>
-          <option value="" disabled>Selecciona…</option>
-          <option value="Set Club (90-120 min)">Set Club — 90/120 min</option>
-          <option value="Peak Time (2-3h)">Peak Time — 2/3h</option>
-          <option value="All Night Long (5-7h)">All Night Long — 5/7h</option>
-        </SelectField>
-
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="booking-fecha" className={labelClass}>
-            Fecha del evento<Required />
+        <div className="flex flex-col gap-1.5 sm:col-span-2">
+          <label htmlFor="booking-presupuesto" className={labelClass}>
+            Presupuesto orientativo
           </label>
           <input
-            id="booking-fecha"
-            name="fecha"
-            type="date"
-            required
-            min={minDate}
-            className={inputClass}
-          />
-        </div>
-
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="booking-ciudad" className={labelClass}>
-            Ciudad<Required />
-          </label>
-          <input
-            id="booking-ciudad"
-            name="ciudad"
+            id="booking-presupuesto"
+            name="presupuesto"
             type="text"
-            required
             maxLength={120}
-            autoComplete="address-level2"
-            placeholder="Madrid, Barcelona…"
+            placeholder="Opcional: una cifra, un rango o «prefiero propuesta»"
             className={inputClass}
           />
         </div>
@@ -193,7 +236,7 @@ export function BookingForm() {
             name="mensaje"
             rows={3}
             maxLength={2000}
-            placeholder="Horario estimado, aforo, rider específico o cualquier detalle…"
+            placeholder="Line-up, estilo de la noche, equipo en cabina o cualquier detalle…"
             className={inputClass + " resize-none"}
           />
         </div>

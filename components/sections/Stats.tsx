@@ -25,7 +25,7 @@ export function Stats() {
               <dt className="text-xs uppercase tracking-[0.15em] text-text-secondary md:text-sm">
                 {s.label}
               </dt>
-              <dd className="m-0 font-display text-4xl uppercase leading-none text-gradient md:text-5xl">
+              <dd className="m-0 font-display text-4xl uppercase leading-none text-text-primary md:text-5xl">
                 {s.value}
               </dd>
             </Reveal>

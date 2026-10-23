@@ -46,6 +46,22 @@ describe("submitBooking", () => {
     expect(html).toContain("promotor@sala.com");
   });
 
+  it("acepta un booking sin formato e incluye sala, franja y presupuesto", async () => {
+    const res = await submitBooking({
+      ...validBooking,
+      formato: "",
+      sala: "Mondo Disko",
+      franja: "Peak time",
+      presupuesto: "A convenir <i>",
+    });
+    expect(res).toEqual({ success: true });
+    const html = sendTelegramMessage.mock.calls[0][0];
+    expect(html).toContain("Sin preferencia");
+    expect(html).toContain("Mondo Disko");
+    expect(html).toContain("Peak time");
+    expect(html).toContain("A convenir &lt;i&gt;");
+  });
+
   it("acepta en silencio (sin enviar) cuando el honeypot va relleno", async () => {
     const res = await submitBooking({ ...validBooking, web: "http://spam" });
     expect(res).toEqual({ success: true });
