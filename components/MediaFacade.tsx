@@ -1,8 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { Play } from "lucide-react";
+import { useActivePlayer } from "@/components/ActivePlayer";
 
 /**
  * Portada clicable que sólo monta el reproductor tras el clic. Evita cargar
@@ -25,7 +26,12 @@ export function MediaFacade({
   sizes?: string;
   children: React.ReactNode;
 }) {
-  const [playing, setPlaying] = useState(false);
+  const id = useId();
+  const activePlayer = useActivePlayer();
+  // Fuera del provider (no debería pasar) cada fachada se gobierna sola.
+  const [localPlaying, setLocalPlaying] = useState(false);
+  const playing = activePlayer ? activePlayer.activeId === id : localPlaying;
+  const play = () => (activePlayer ? activePlayer.setActiveId(id) : setLocalPlaying(true));
   const playerRef = useRef<HTMLDivElement>(null);
 
   // El botón enfocado desaparece al montar el reproductor: se pasa el foco al
@@ -39,7 +45,7 @@ export function MediaFacade({
   return (
     <button
       type="button"
-      onClick={() => setPlaying(true)}
+      onClick={play}
       aria-label={`Reproducir ${title}`}
       className={`group relative block w-full overflow-hidden focus-visible:outline-offset-[-3px] ${
         ratio === "square" ? "aspect-square" : "aspect-video"

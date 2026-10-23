@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Play, ArrowRight } from "lucide-react";
+import { CalendarCheck, Play } from "lucide-react";
 import { site } from "@/lib/data";
 
 const GENRES = ["Trance", "Progressive", "Tech House", "House", "Nu Disco", "Remember"];
@@ -75,19 +75,15 @@ export function Hero() {
             href={site.hero.primaryCta.href}
             className="group inline-flex items-center gap-2 gradient-primary px-7 py-4 text-sm font-semibold text-white rounded-full shadow-glow-strong transition-transform hover:scale-105"
           >
-            <Play size={16} className="fill-white" aria-hidden="true" />
+            <CalendarCheck size={16} aria-hidden="true" />
             {site.hero.primaryCta.label}
           </Link>
           <Link
             href={site.hero.secondaryCta.href}
             className="group inline-flex items-center gap-2 border border-border-dark bg-dark-secondary/50 px-7 py-4 text-sm font-semibold text-text-primary rounded-full transition-colors hover:bg-dark-secondary"
           >
+            <Play size={16} className="fill-current" aria-hidden="true" />
             {site.hero.secondaryCta.label}
-            <ArrowRight
-              size={16}
-              className="transition-transform group-hover:translate-x-1"
-              aria-hidden="true"
-            />
           </Link>
         </div>
 

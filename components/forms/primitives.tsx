@@ -7,8 +7,10 @@ import { AlertCircle, CheckCircle, Loader2, Send } from "lucide-react";
 // Estilos compartidos por los dos formularios (booking y contacto).
 // border-white/40: el borde es la única pista visual del límite del campo y
 // con /10 quedaba en ~1.5:1 de contraste (WCAG 1.4.11 pide 3:1).
+// text-base en móvil: Safari iOS amplía la página al enfocar cualquier campo
+// de menos de 16 px.
 export const inputClass =
-  "w-full rounded-xl border border-white/40 bg-white/5 px-4 py-3 text-sm text-text-primary placeholder:text-text-secondary outline-none transition focus:border-accent-red focus:bg-white/8 focus:ring-1 focus:ring-accent-red/40";
+  "w-full rounded-xl border border-white/40 bg-white/5 px-4 py-3 text-base md:text-sm text-text-primary placeholder:text-text-secondary outline-none transition focus:border-accent-red focus:bg-white/8 focus:ring-1 focus:ring-accent-red/40";
 
 export const selectClass = inputClass + " appearance-none cursor-pointer pr-10";
 

@@ -48,8 +48,10 @@ export const site = {
     headline: "MUSIC IS THE ANSWER",
     subheadline:
       "Más de 19 años detrás de los platos. Todo terreno donde se necesite: remember, trance, tech house, house y nu disco. Un DJ que se adapta a la sala, al público y al momento.",
-    primaryCta: { label: "Escuchar último set", href: "#mixes" },
-    secondaryCta: { label: "Conoce a Swarthy", href: "#about" },
+    // El primario lleva al booking: un promotor que llega con prisa tiene que
+    // ver la acción principal sin bajar doce secciones.
+    primaryCta: { label: "Solicitar fecha", href: "#booking" },
+    secondaryCta: { label: "Escuchar último set", href: "#mixes" },
   },
 
   // Barra de cifras (stat band) — datos verificables, sin inventar

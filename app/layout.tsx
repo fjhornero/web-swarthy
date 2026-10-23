@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Bebas_Neue, Inter } from "next/font/google";
 import "./globals.css";
 import { MotionProvider } from "@/components/motion/MotionProvider";
+import { ActivePlayerProvider } from "@/components/ActivePlayer";
 import { buildJsonLdString } from "@/lib/json-ld";
 import { SITE_URL, SITE_NAME } from "@/lib/site";
 
@@ -114,7 +115,9 @@ export default function RootLayout({
           data-domain="djswarthy.es"
           src="https://plausible.io/js/script.js"
         />
-        <MotionProvider>{children}</MotionProvider>
+        <MotionProvider>
+          <ActivePlayerProvider>{children}</ActivePlayerProvider>
+        </MotionProvider>
       </body>
     </html>
   );
