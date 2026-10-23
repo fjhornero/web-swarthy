@@ -18,7 +18,7 @@ npm run typecheck           # tsc --noEmit
 npm test                    # vitest: tests/ (lógica de servidor: actions, feeds, dates, telegram, rate limit, JSON-LD)
 ```
 
-CI runs all four plus `npm audit --omit=dev --audit-level=high` and the build. Node **22** in both the Dockerfile and `ci.yml` (Node 20 is out of support since April 2026); keep them in sync.
+CI runs all four plus `npm audit --omit=dev --audit-level=critical` and the build (the level is `critical` because Next 15.5 nests a build-time-only postcss with a `high` advisory that only Next 16 fixes; lower it to `high` after that migration). Node **22** in both the Dockerfile and `ci.yml` (Node 20 is out of support since April 2026); keep them in sync.
 
 If `npm run dev` (and `npx next ...`) returns a truncated "Errors: 1 | Warnings: 0" summary, the npx wrapper is swallowing output — call the binary directly: `./node_modules/.bin/next dev`.
 
