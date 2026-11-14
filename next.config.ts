@@ -7,9 +7,16 @@ import type { NextConfig } from "next";
 // leer headers() en el layout, lo que fuerza renderizado dinámico y rompe la
 // revalidación estática horaria de la home. Sin 'unsafe-inline' aquí, esos
 // scripts quedan bloqueados y React nunca hidrata.
+//
+// 'unsafe-eval' sólo en desarrollo: `next dev` evalúa código para el HMR y los
+// source maps, y sin ello el cliente no llega a hidratar (la página se queda
+// en el HTML del servidor, con todo lo animado invisible). En producción no
+// se emite.
+const isDev = process.env.NODE_ENV !== "production";
+
 const csp = [
   `default-src 'self'`,
-  `script-src 'self' 'unsafe-inline' https://plausible.io`,
+  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""} https://plausible.io`,
   `style-src 'self' 'unsafe-inline'`,
   `img-src 'self' data:`,
   `font-src 'self'`,
