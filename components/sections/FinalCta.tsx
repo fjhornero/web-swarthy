@@ -59,7 +59,10 @@ export function FinalCta() {
         </Reveal>
 
         <Reveal y={32} duration={0.7} delay={0.15} margin="-80px">
-          <BookingForm />
+          <BookingForm
+            formats={site.formats.map((f) => f.option)}
+            email={site.bookingEmail}
+          />
         </Reveal>
       </div>
     </section>
