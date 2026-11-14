@@ -11,4 +11,4 @@ export const OG_IMAGE = "/images/og.jpg";
 /** Fecha de la última revisión del contenido estático (copy, FAQ, legal).
  *  Actualizar a mano cuando cambie el contenido: alimenta `lastModified` del
  *  sitemap, que sería mentira si fuese `new Date()` en cada petición. */
-export const CONTENT_UPDATED_AT = "2026-10-23";
+export const CONTENT_UPDATED_AT = "2026-11-14";
