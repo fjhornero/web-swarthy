@@ -5,9 +5,10 @@ import { Plus } from "lucide-react";
 import { useState } from "react";
 import { Reveal } from "@/components/motion/Reveal";
 import { SectionHeading } from "@/components/SectionHeading";
-import { site } from "@/lib/data";
 
-export function Faq() {
+// Las preguntas llegan por props desde el servidor: importar lib/data.ts aquí
+// metería todo el contenido del sitio (bios, rider, formatos) en el bundle.
+export function Faq({ items }: { items: Array<{ q: string; a: string }> }) {
   const [open, setOpen] = useState<number | null>(0);
 
   return (
@@ -24,7 +25,7 @@ export function Faq() {
         />
 
         <div className="space-y-3">
-          {site.faq.map((f, i) => {
+          {items.map((f, i) => {
             const isOpen = open === i;
             const buttonId = `faq-button-${i}`;
             const panelId = `faq-panel-${i}`;
