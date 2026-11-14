@@ -12,9 +12,18 @@ import { AlertCircle, CheckCircle, Loader2, Send } from "lucide-react";
 export const inputClass =
   "w-full rounded-xl border border-white/40 bg-white/5 px-4 py-3 text-base md:text-sm text-text-primary placeholder:text-text-secondary outline-none transition focus:border-accent-red focus:bg-white/8 focus:ring-1 focus:ring-accent-red/40";
 
-export const selectClass = inputClass + " appearance-none cursor-pointer pr-10";
+// El último modificador atenúa el select mientras tiene elegida la opción
+// vacía ("Selecciona…"): con el mismo blanco que un valor real parecía ya
+// rellenado.
+export const selectClass =
+  inputClass +
+  " appearance-none cursor-pointer pr-10 [&:has(option[value='']:checked)]:text-text-secondary";
 
 export const labelClass = "text-xs uppercase tracking-widest text-text-secondary";
+
+/** Título de cada bloque de un formulario largo ("1 · El evento"). */
+export const legendClass =
+  "mb-4 w-full border-b border-white/10 pb-2 text-xs font-semibold uppercase tracking-[0.2em] text-accent-orange";
 
 /** Asterisco de campo obligatorio: visual, con la leyenda explicándolo. */
 export function Required() {
@@ -67,11 +76,14 @@ export function FormSuccess({
   text,
   resetLabel,
   onReset,
+  children,
 }: {
   title: string;
   text: string;
   resetLabel: string;
   onReset: () => void;
+  /** Siguientes pasos que ofrecer mientras llega la respuesta */
+  children?: React.ReactNode;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -90,6 +102,7 @@ export function FormSuccess({
       <CheckCircle size={48} className="text-accent-orange" aria-hidden="true" />
       <h3 className="font-display text-3xl uppercase text-text-primary">{title}</h3>
       <p className="max-w-sm text-sm text-text-secondary">{text}</p>
+      {children}
       <button
         type="button"
         onClick={onReset}

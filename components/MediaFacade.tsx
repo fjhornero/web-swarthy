@@ -1,9 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useId, useRef, useState } from "react";
 import { Play } from "lucide-react";
-import { useActivePlayer } from "@/components/ActivePlayer";
+import { usePlayer } from "@/components/ActivePlayer";
 
 /**
  * Portada clicable que sólo monta el reproductor tras el clic. Evita cargar
@@ -14,6 +13,7 @@ export function MediaFacade({
   thumbnail,
   title,
   compact,
+  mini,
   ratio = "video",
   sizes,
   children,
@@ -21,31 +21,28 @@ export function MediaFacade({
   thumbnail?: string;
   title: string;
   compact?: boolean;
+  /** Botón de play más pequeño en móvil, para miniaturas de fila compacta */
+  mini?: boolean;
   /** Proporción de la portada: 16:9 para vídeo, 1:1 para carátulas */
   ratio?: "video" | "square";
   sizes?: string;
   children: React.ReactNode;
 }) {
-  const id = useId();
-  const activePlayer = useActivePlayer();
-  // Fuera del provider (no debería pasar) cada fachada se gobierna sola.
-  const [localPlaying, setLocalPlaying] = useState(false);
-  const playing = activePlayer ? activePlayer.activeId === id : localPlaying;
-  const play = () => (activePlayer ? activePlayer.setActiveId(id) : setLocalPlaying(true));
-  const playerRef = useRef<HTMLDivElement>(null);
+  const { id, playing, play, playerRef } = usePlayer(title);
 
-  // El botón enfocado desaparece al montar el reproductor: se pasa el foco al
-  // iframe para que un usuario de teclado no lo pierda.
-  useEffect(() => {
-    if (playing) playerRef.current?.querySelector("iframe")?.focus();
-  }, [playing]);
-
-  if (playing) return <div ref={playerRef}>{children}</div>;
+  if (playing) {
+    return (
+      <div ref={playerRef} data-player={id}>
+        {children}
+      </div>
+    );
+  }
 
   return (
     <button
       type="button"
       onClick={play}
+      data-player={id}
       aria-label={`Reproducir ${title}`}
       className={`group relative block w-full overflow-hidden focus-visible:outline-offset-[-3px] ${
         ratio === "square" ? "aspect-square" : "aspect-video"
@@ -70,10 +67,15 @@ export function MediaFacade({
       <div className="absolute inset-0 bg-black/30 transition-colors group-hover:bg-black/15" />
       <span
         className={`absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-white/30 bg-black/40 backdrop-blur-sm transition-[transform,background-color] group-hover:scale-110 group-hover:bg-accent-red ${
-          compact ? "h-12 w-12" : "h-16 w-16"
+          mini ? "h-9 w-9 sm:h-12 sm:w-12" : compact ? "h-12 w-12" : "h-16 w-16"
         }`}
       >
-        <Play size={compact ? 18 : 24} className="ml-0.5 fill-white text-white" aria-hidden="true" />
+        <Play
+          className={`ml-0.5 fill-white text-white ${
+            mini ? "h-3.5 w-3.5 sm:h-[18px] sm:w-[18px]" : compact ? "h-[18px] w-[18px]" : "h-6 w-6"
+          }`}
+          aria-hidden="true"
+        />
       </span>
     </button>
   );

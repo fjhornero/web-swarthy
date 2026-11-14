@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 vi.mock("@/lib/data", () => ({
   site: {
     bookingEmail: "test@example.com",
+    genres: ["Trance", "Remember"],
     socials: [{ label: "X", url: "https://x.com/test" }],
     faq: [{ q: "¿Qué pasa con </script>?", a: "Nada" }],
     dates: [
@@ -24,6 +25,12 @@ describe("buildJsonLd", () => {
       startDate: "2026-11-20",
       offers: { availability: "https://schema.org/SoldOut" },
     });
+  });
+
+  it("toma los géneros del artista de la lista única de lib/data.ts", () => {
+    const graph = buildJsonLd(new Date("2026-10-23T12:00:00Z"))["@graph"] as Array<Record<string, unknown>>;
+    const artist = graph.find((n) => n["@type"] === "MusicGroup");
+    expect(artist?.genre).toEqual(["Trance", "Remember"]);
   });
 
   it("no emite eventos cuando todas las fechas han pasado", () => {

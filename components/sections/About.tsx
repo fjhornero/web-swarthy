@@ -41,7 +41,7 @@ export function About() {
             </div>
             <Link
               href="/press-kit"
-              className="group mt-8 inline-flex items-center gap-2 text-sm font-semibold text-accent-orange hover:underline"
+              className="group mt-8 inline-flex min-h-11 items-center gap-2 rounded-full border border-border-dark bg-dark-primary px-6 text-sm font-semibold text-text-primary transition-colors hover:border-text-secondary"
             >
               Ver press kit y rider técnico
               <ArrowRight

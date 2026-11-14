@@ -17,6 +17,7 @@ import {
   inputClass,
   labelClass,
 } from "@/components/forms/primitives";
+import { track } from "@/lib/analytics";
 
 export function Contact() {
   const [isPending, startTransition] = useTransition();
@@ -40,7 +41,10 @@ export function Contact() {
       try {
         const res = await submitContact(fields);
         setResult(res);
-        if (res?.success) form.reset();
+        if (res?.success) {
+          track("Contacto enviado");
+          form.reset();
+        }
       } catch {
         setResult({ success: false, error: NETWORK_ERROR });
       }

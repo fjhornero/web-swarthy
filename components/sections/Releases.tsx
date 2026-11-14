@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { AudioLines, ExternalLink } from "lucide-react";
 import { MediaFacade } from "@/components/MediaFacade";
+import { MixCard } from "@/components/MixCard";
 import { SpotifyEmbed } from "@/components/SpotifyEmbed";
 import { SpotifyProfilePlayer } from "@/components/SpotifyProfilePlayer";
 import { Reveal } from "@/components/motion/Reveal";
@@ -8,10 +9,13 @@ import { SectionHeading } from "@/components/SectionHeading";
 import { NewTabHint } from "@/components/NewTabHint";
 import { site } from "@/lib/data";
 import type { SpotifyArtistCard, SpotifyRelease } from "@/lib/spotify";
+import type { MixCardData } from "@/lib/mixes";
 
 interface ReleasesProps {
   releases: SpotifyRelease[];
   artist: SpotifyArtistCard | null;
+  /** Producciones y versiones publicadas en SoundCloud y YouTube (ver splitMixes) */
+  productions: MixCardData[];
 }
 
 const ARTIST_URL = `https://open.spotify.com/artist/${site.spotifyArtistId}`;
@@ -24,23 +28,23 @@ const typeLabels: Record<string, string> = {
   appears_on: "Colaboración",
 };
 
-export function Releases({ releases, artist }: ReleasesProps) {
+export function Releases({ releases, artist, productions }: ReleasesProps) {
   const hasReleases = releases.length > 0;
 
   return (
     <section id="spotify" className="relative bg-dark-primary py-20 md:py-28">
       <div className="mx-auto max-w-6xl px-5 md:px-8">
         <SectionHeading
-          overline="EN SPOTIFY"
+          overline="MÚSICA PROPIA"
           title={
             <>
               Sus <span className="text-gradient">lanzamientos</span>
             </>
           }
         >
-          <p className="mx-auto mt-4 max-w-xl text-sm text-text-secondary">
-            Producciones y ediciones propias, disponibles al completo en
-            Spotify.
+          <p className="mx-auto mt-4 max-w-xl text-text-secondary">
+            Además de pinchar, produce: temas y versiones propias en Spotify,
+            SoundCloud y YouTube.
           </p>
         </SectionHeading>
 
@@ -107,7 +111,7 @@ export function Releases({ releases, artist }: ReleasesProps) {
                 Reproductor oficial
               </span>
             </div>
-            <SpotifyProfilePlayer artist={artist} />
+            <SpotifyProfilePlayer artist={artist} artistId={site.spotifyArtistId} />
           </Reveal>
         )}
 
@@ -122,6 +126,23 @@ export function Releases({ releases, artist }: ReleasesProps) {
             <NewTabHint />
           </Link>
         </div>
+
+        {/* Lo que los feeds traen y no es una sesión: temas propios y
+            versiones. Va aquí, con el resto de su música, y no entre los sets. */}
+        {productions.length > 0 && (
+          <div className="mt-16">
+            <h3 className="mb-6 font-sans text-xs font-medium uppercase tracking-[0.2em] text-text-secondary">
+              Producciones y versiones
+            </h3>
+            <ul className="grid gap-3 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
+              {productions.map((mix, i) => (
+                <Reveal as="li" key={mix.key} y={20} delay={(i % 3) * 0.07}>
+                  <MixCard mix={mix} className="bg-dark-secondary" />
+                </Reveal>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
     </section>
   );

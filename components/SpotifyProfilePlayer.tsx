@@ -1,10 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
 import { Play } from "lucide-react";
+import { usePlayer } from "@/components/ActivePlayer";
 import { SpotifyEmbed } from "@/components/SpotifyEmbed";
-import { site } from "@/lib/data";
 import type { SpotifyArtistCard } from "@/lib/spotify";
 
 /**
@@ -13,24 +12,27 @@ import type { SpotifyArtistCard } from "@/lib/spotify";
  * reproductor. Mismo trato que MediaFacade —el iframe no existe hasta el
  * clic— pero con presentación horizontal en vez de portada gigante.
  */
-export function SpotifyProfilePlayer({ artist }: { artist: SpotifyArtistCard | null }) {
-  const [playing, setPlaying] = useState(false);
-  const playerRef = useRef<HTMLDivElement>(null);
+export function SpotifyProfilePlayer({
+  artist,
+  artistId,
+}: {
+  artist: SpotifyArtistCard | null;
+  /** Id de artista en Spotify. Por props y no desde lib/data.ts: importarlo
+   *  aquí arrastraría todo el contenido del sitio al bundle de cliente. */
+  artistId: string;
+}) {
   const name = artist?.name ?? "DJ Swarthy";
-
-  // El botón que tenía el foco desaparece al montar el reproductor: se lleva
-  // el foco al iframe para no dejarlo caer al <body>.
-  useEffect(() => {
-    if (playing) playerRef.current?.querySelector("iframe")?.focus();
-  }, [playing]);
+  // Mismo grupo que las fachadas: si suena un set y se abre Spotify (o al
+  // revés), el anterior se cierra en vez de sonar los dos a la vez.
+  const { id, playing, play, playerRef } = usePlayer(`${name} en Spotify`);
 
   if (playing) {
     // El embed pinta su propio fondo redondeado: sin este colchón sus esquinas
     // chocan con el borde de la tarjeta.
     return (
-      <div ref={playerRef} className="p-4 sm:p-5">
+      <div ref={playerRef} data-player={id} className="p-4 sm:p-5">
         <SpotifyEmbed
-          src={`https://open.spotify.com/embed/artist/${site.spotifyArtistId}?theme=0`}
+          src={`https://open.spotify.com/embed/artist/${artistId}?theme=0`}
           title={`${name} en Spotify`}
           height={420}
         />
@@ -56,7 +58,8 @@ export function SpotifyProfilePlayer({ artist }: { artist: SpotifyArtistCard | n
         </p>
         <button
           type="button"
-          onClick={() => setPlaying(true)}
+          onClick={play}
+          data-player={id}
           className="mt-5 inline-flex items-center gap-2 rounded-full border border-border-dark bg-dark-primary px-6 py-3 text-sm font-semibold text-text-primary transition-colors hover:bg-dark-secondary"
         >
           <Play size={16} className="fill-white text-white" aria-hidden="true" />

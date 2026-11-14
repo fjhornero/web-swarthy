@@ -16,7 +16,9 @@ import { Contact } from "@/components/sections/Contact";
 import { FinalCta } from "@/components/sections/FinalCta";
 import { getLatestYouTubeVideos, getLatestSoundCloudTracks } from "@/lib/feeds";
 import { getSpotifyReleases, getSpotifyArtistCard } from "@/lib/spotify";
+import { splitMixes, toMixCard } from "@/lib/mixes";
 import { upcomingDates } from "@/lib/dates";
+import { site } from "@/lib/data";
 
 // La home se prerrenderiza y se regenera como mucho cada hora: los feeds ya
 // llevan `revalidate: 3600` en sus fetch, pero fijarlo aquí deja el
@@ -39,6 +41,14 @@ export default async function Home() {
     artist.status === "fulfilled" ? artist.value : null,
   ] as const);
 
+  // Los feeds mezclan sesiones y producciones. Se separan una sola vez: las
+  // sesiones (lo que un promotor escucha para decidir) van a Mixes y las
+  // producciones, con el resto de su música, a Releases.
+  const mixes = splitMixes(ytVideos, scTracks);
+  const featured = mixes.featured.map(toMixCard);
+  const sets = mixes.sets.map(toMixCard);
+  const productions = mixes.productions.map(toMixCard);
+
   // El filtrado por fecha se hace aquí (servidor) con la zona horaria de la
   // agenda; el componente sólo pinta lo que recibe.
   const dates = upcomingDates();
@@ -52,15 +62,15 @@ export default async function Home() {
             genérico va detrás del de booking para que nadie lo use para
             contratar (no recoge fecha ni ciudad). */}
         <Hero />
-        <Stats />
+        <Stats sessions={featured.length + sets.length} />
         <Dates dates={dates} />
         <Venues />
-        <Mixes videos={ytVideos} tracks={scTracks} />
+        <Mixes featured={featured} sets={sets} />
         <Formats />
         <About />
-        <Releases releases={spotifyReleases} artist={spotifyArtist} />
+        <Releases releases={spotifyReleases} artist={spotifyArtist} productions={productions} />
         <Testimonials />
-        <Faq />
+        <Faq items={site.faq} />
         <FinalCta />
         <Contact />
         <Socials />

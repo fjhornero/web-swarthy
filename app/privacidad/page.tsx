@@ -162,8 +162,11 @@ export default function PrivacidadPage() {
                 >
                   Plausible
                 </a>
-                , que mide visitas de forma agregada y anónima, sin cookies y sin
-                datos personales, por lo que no requiere banner de consentimiento.
+                , que mide las visitas y algunas acciones (darle al play a una
+                sesión, enviar un formulario) de forma agregada y anónima, sin
+                cookies y sin datos personales, por lo que no requiere banner de
+                consentimiento. Nunca se registra lo que escribes en los
+                formularios.
               </p>
               <p>
                 Si reproduces un vídeo de YouTube o un track de SoundCloud

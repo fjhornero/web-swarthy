@@ -82,6 +82,35 @@
       transition-duration: 0.01ms !important;
     }
   }
+
+  /* Papel y "Guardar como PDF": el press kit se imprime (rider y bio para la
+     sala). Se invierte la paleta redefiniendo los tokens, de modo que todas las
+     utilidades de color pasan a tinta sobre blanco sin tocar los componentes.
+     La cabecera, el pie y los botones se ocultan con `print:hidden`. */
+  @media print {
+    :root {
+      --color-dark-primary: #ffffff;
+      --color-dark-secondary: #ffffff;
+      --color-dark-tertiary: #f3f4f6;
+      --color-border-dark: #d1d5db;
+      --color-text-primary: #0a0a0a;
+      --color-text-secondary: #374151;
+      --color-text-muted: #6b7280;
+      --color-accent-orange: #c2410c;
+    }
+
+    html {
+      color-scheme: light;
+    }
+
+    /* Una entrada animada a medias dejaría bloques en blanco en el papel. */
+    *,
+    *::before,
+    *::after {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
 }
 
 @layer utilities {
@@ -102,6 +131,16 @@
     -webkit-background-clip: text;
     color: transparent;
     -webkit-text-fill-color: transparent;
+  }
+  /* Los navegadores no imprimen fondos por defecto: el texto recortado sobre
+     el gradiente saldría invisible ("Dossier de" sin "prensa"). Tiene que ir
+     en esta misma capa: desde `base` no podría pisar a una utilidad. */
+  @media print {
+    .text-gradient {
+      background-image: none;
+      color: var(--color-accent-red);
+      -webkit-text-fill-color: currentColor;
+    }
   }
 
   /* Glow rojo difuso (radial) */
@@ -142,6 +181,12 @@
   }
   .pulse-dot {
     animation: pulse-dot 1.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  /* Texto en contorno: el nombre de la sala como textura en las tarjetas sin foto */
+  .text-outline {
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(255, 255, 255, 0.13);
   }
 
   /* Card hover lift */

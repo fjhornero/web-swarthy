@@ -3,6 +3,7 @@ import { Bebas_Neue, Inter } from "next/font/google";
 import "./globals.css";
 import { MotionProvider } from "@/components/motion/MotionProvider";
 import { ActivePlayerProvider } from "@/components/ActivePlayer";
+import { NowPlaying } from "@/components/NowPlaying";
 import { buildJsonLdString } from "@/lib/json-ld";
 import { SITE_URL, SITE_NAME } from "@/lib/site";
 
@@ -116,7 +117,12 @@ export default function RootLayout({
           src="https://plausible.io/js/script.js"
         />
         <MotionProvider>
-          <ActivePlayerProvider>{children}</ActivePlayerProvider>
+          <ActivePlayerProvider>
+            {/* Antes del contenido: cuando aparece, sus dos botones quedan al
+                principio del orden de tabulación y no detrás del pie. */}
+            <NowPlaying />
+            {children}
+          </ActivePlayerProvider>
         </MotionProvider>
       </body>
     </html>
