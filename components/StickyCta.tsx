@@ -36,7 +36,7 @@ export function StickyCta() {
 
   return (
     <div
-      className={`fixed bottom-4 inset-x-4 z-40 md:hidden transition-[transform,opacity,visibility] duration-300 ${
+      className={`fixed bottom-4 inset-x-4 z-40 md:hidden print:hidden transition-[transform,opacity,visibility] duration-300 ${
         // `invisible` (visibility:hidden) lo saca del orden de tabulación: con
         // sólo opacity-0 el enlace seguía recibiendo el foco sin verse.
         visible

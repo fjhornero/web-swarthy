@@ -60,7 +60,7 @@ export function buildJsonLd(now: Date = new Date()) {
         image: `${SITE_URL}${OG_IMAGE}`,
         description:
           "DJ con más de 19 años pinchando trance, progressive, tech house, house, nu disco y remember. Booking abierto en Madrid y toda España.",
-        genre: ["Trance", "Progressive", "Tech House", "House", "Nu Disco", "Remember"],
+        genre: site.genres,
         sameAs: site.socials.map((s) => s.url),
         address: {
           "@type": "PostalAddress",
