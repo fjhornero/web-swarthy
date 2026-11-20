@@ -1,12 +1,13 @@
 import type { MetadataRoute } from "next";
-import { SITE_NAME } from "@/lib/site";
+import { site } from "@/lib/data";
+import { SITE_NAME, sentenceList } from "@/lib/site";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
     name: SITE_NAME,
     short_name: "Swarthy",
-    description:
-      "DJ Swarthy, DJ profesional en Madrid. Trance, house, tech house, nu disco y remember.",
+    // Los estilos salen de la lista única de lib/data.ts, no escritos a mano.
+    description: `DJ Swarthy, DJ profesional en Madrid. ${sentenceList(site.genres)}.`,
     lang: "es",
     start_url: "/",
     display: "browser",

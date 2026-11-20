@@ -50,6 +50,14 @@ export interface PressAsset {
   files: Array<{ label: string; href: string; download: string }>;
 }
 
+// Bio corta: quién es, dónde está, cuánto lleva y en qué salas ha pinchado, en
+// tres frases que se pueden citar tal cual. Es la del press kit
+// (`press.bioShort`) y la que abre «Sobre mí» en la home (`about.intro`): una
+// sola constante para que las dos digan siempre lo mismo. Su traducción es
+// `press.bioShortEn` y cambia con ella.
+const BIO_SHORT =
+  "DJ Swarthy es un DJ y productor afincado en Madrid con más de 19 años de carrera. Su base es el trance y el progressive, pero se mueve con la misma soltura por el tech house, el house, el nu disco y el remember. Ha pinchado en salas como Joy Eslava, Mondo Disko, Sala Taboo o Café La Palma.";
+
 export const site = {
   name: "DJ SWARTHY",
   tagline: "DJ · PRODUCTOR · TODO TERRENO",
@@ -68,7 +76,9 @@ export const site = {
   genres: ["Trance", "Progressive", "Tech House", "House", "Nu Disco", "Remember"],
 
   hero: {
-    overline: "DJ · PRODUCTOR · MADRID",
+    // Dice a la vista qué es y dónde ("DJ … en Madrid"), que es lo que busca
+    // quien llega: antes lo decía un texto oculto dentro del h1.
+    overline: "DJ Y PRODUCTOR EN MADRID",
     // El nombre es el titular y el lema va debajo: quien llega tiene que saber
     // de quién es la web antes que su eslogan. Es la misma jerarquía que la
     // imagen social (app/opengraph-image.tsx), para que lo que se ve al
@@ -98,6 +108,19 @@ export const site = {
 
   about: {
     headline: "CONOCE A SWARTHY",
+    // Primer párrafo de la sección: los hechos (quién, dónde, cuánto lleva, en
+    // qué salas) antes que la historia, que por sí sola no nombra Madrid ni
+    // ninguna sala.
+    intro: BIO_SHORT,
+    // Datos rápidos de la sección (components/QuickFacts.tsx): los tres que no
+    // salen de una lista de este fichero. No añaden ningún dato: repiten en
+    // corto lo que ya dicen la bio, las cifras de arriba y la FAQ, y cambian
+    // con ellas.
+    facts: {
+      who: "DJ Swarthy, DJ y productor",
+      where: "Base en Madrid · fechas en toda España",
+      career: "Más de 19 años en cabina",
+    },
     body: "Todo empezó en las fiestas del pueblo, con un maletín de vinilos, ganas de hacerlo bien y la certeza de que la música podía cambiar el ambiente de una plaza en cuestión de minutos. Ahí nació Swarthy.\n\nDiecinueve años después, ese instinto sigue intacto. Su corazón late al ritmo del progressive y el trance — esa música que construye paisajes, que sube despacio y te lleva lejos — pero su versatilidad es su sello: de un remember ochentero a un tech house de madrugada, pasando por house melódico o nu disco, ningún estilo le es ajeno y ninguno te dejará indiferente.\n\nUn DJ que no pincha para él, sino para quien llena la sala.",
   },
 
@@ -170,8 +193,7 @@ export const site = {
 
   // Contenido del press kit (/press-kit)
   press: {
-    bioShort:
-      "DJ Swarthy es un DJ y productor afincado en Madrid con más de 19 años de carrera. Su base es el trance y el progressive, pero se mueve con la misma soltura por el tech house, el house, el nu disco y el remember. Ha pinchado en salas como Joy Eslava, Mondo Disko, Sala Taboo o Café La Palma.",
+    bioShort: BIO_SHORT,
     rider: [
       "2x CDJ-3000 (o equivalente: CDJ-2000NXS2)",
       "1x mixer profesional (DJM-A9, DJM-900NXS2, Xone o V10)",

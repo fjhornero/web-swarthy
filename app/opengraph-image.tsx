@@ -64,7 +64,7 @@ export default async function OpenGraphImage() {
               display: "flex",
             }}
           >
-            DJ · PRODUCTOR · MADRID
+            DJ Y PRODUCTOR EN MADRID
           </div>
           <div
             style={{

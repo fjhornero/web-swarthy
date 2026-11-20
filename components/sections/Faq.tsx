@@ -1,6 +1,5 @@
 "use client";
 
-import { m, AnimatePresence } from "framer-motion";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import { Reveal } from "@/components/motion/Reveal";
@@ -17,8 +16,11 @@ export function Faq({ items }: { items: Array<{ q: string; a: string }> }) {
         <SectionHeading
           overline="DUDAS FRECUENTES"
           title={
+            // El acento no se parte: sin `whitespace-nowrap`, en escritorio
+            // «contratar» se quedaba solo en la segunda línea.
             <>
-              Preguntas y <span className="text-gradient">respuestas</span>
+              Preguntas frecuentes{" "}
+              <span className="whitespace-nowrap text-gradient">antes de contratar</span>
             </>
           }
           className="mb-12"
@@ -59,25 +61,27 @@ export function Faq({ items }: { items: Array<{ q: string; a: string }> }) {
                     />
                   </button>
                 </h3>
-                {/* El contenedor del panel existe siempre para que aria-controls
-                    apunte a un id real; AnimatePresence monta y desmonta el
-                    contenido animando la altura. */}
-                <div id={panelId} role="region" aria-labelledby={buttonId}>
-                  <AnimatePresence initial={false}>
-                    {isOpen && (
-                      <m.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.3 }}
-                        className="overflow-hidden"
-                      >
-                        <p className="px-6 pb-5 text-sm text-text-secondary leading-relaxed md:px-8 md:text-base">
-                          {f.a}
-                        </p>
-                      </m.div>
-                    )}
-                  </AnimatePresence>
+                {/* La respuesta está siempre en el HTML, también plegada: cuando
+                    sólo se montaba al abrir, los buscadores y los asistentes de
+                    IA no leían más que la primera. Se pliega con CSS: la fila
+                    de la rejilla pasa de 0fr a 1fr (una altura "auto" que sí
+                    admite transición) y, cerrada, queda con visibility: hidden,
+                    de modo que ni el lector de pantalla ni el tabulador entran
+                    en ella. Con prefers-reduced-motion el cambio es inmediato:
+                    lo impone la regla global de globals.css. */}
+                <div
+                  id={panelId}
+                  role="region"
+                  aria-labelledby={buttonId}
+                  className={`grid transition-[grid-template-rows,opacity,visibility] duration-300 ${
+                    isOpen ? "grid-rows-[1fr]" : "invisible grid-rows-[0fr] opacity-0"
+                  }`}
+                >
+                  <div className="min-h-0 overflow-hidden">
+                    <p className="px-6 pb-5 text-sm text-text-secondary leading-relaxed md:px-8 md:text-base">
+                      {f.a}
+                    </p>
+                  </div>
                 </div>
               </Reveal>
             );

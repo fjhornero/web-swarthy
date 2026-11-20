@@ -29,7 +29,9 @@ export function Mixes({ featured, sets }: MixesProps) {
           overline="ÚLTIMAS SESIONES"
           title={
             <>
-              Escucha y <span className="text-gradient">mira en directo</span>
+              {/* Espacio duro: en móvil el título ocupa dos líneas y el nombre
+                  no debe partirse entre ellas. */}
+              <span className="text-gradient">Sets completos</span> de DJ&nbsp;Swarthy
             </>
           }
         >

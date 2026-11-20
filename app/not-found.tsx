@@ -6,6 +6,9 @@ import { Footer } from "@/components/Footer";
 export const metadata: Metadata = {
   title: "Página no encontrada",
   robots: { index: false, follow: false },
+  // Sin canónica: la del layout ("./") se resolvería contra la ruta interna
+  // /_not-found, y una página que no existe no tiene original que declarar.
+  alternates: { canonical: null },
 };
 
 // Sin este fichero Next sirve su 404 por defecto, en blanco y sin marca.

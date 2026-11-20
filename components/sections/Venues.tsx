@@ -11,7 +11,9 @@ export function Venues() {
           overline="TRAYECTORIA"
           title={
             <>
-              Salas donde ha <span className="text-gradient">pinchado</span>
+              {/* Espacio duro: en móvil el título ocupa dos líneas y así no
+                  queda «pinchado» solo en la segunda. */}
+              Salas de <span className="text-gradient">Madrid</span> donde ha&nbsp;pinchado
             </>
           }
         />

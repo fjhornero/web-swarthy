@@ -15,7 +15,9 @@ export function Formats() {
           overline="FORMATOS"
           title={
             <>
-              Elige el formato de <span className="text-gradient">tu noche</span>
+              {/* Espacios duros: el título ocupa dos líneas hasta tablet y el
+                  nombre, con su preposición, no debe partirse entre ellas. */}
+              Formatos para <span className="text-gradient">contratar</span> a&nbsp;DJ&nbsp;Swarthy
             </>
           }
         >

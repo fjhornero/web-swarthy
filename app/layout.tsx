@@ -4,8 +4,15 @@ import "./globals.css";
 import { MotionProvider } from "@/components/motion/MotionProvider";
 import { ActivePlayerProvider } from "@/components/ActivePlayer";
 import { NowPlaying } from "@/components/NowPlaying";
-import { buildJsonLdString } from "@/lib/json-ld";
-import { SITE_URL, SITE_NAME } from "@/lib/site";
+import { baseNodes, buildJsonLdString } from "@/lib/json-ld";
+import {
+  SITE_URL,
+  SITE_NAME,
+  OPEN_GRAPH_BASE,
+  TWITTER_BASE,
+  GOOGLE_SITE_VERIFICATION,
+  BING_SITE_VERIFICATION,
+} from "@/lib/site";
 
 const bebas = Bebas_Neue({
   variable: "--font-bebas",
@@ -20,40 +27,54 @@ const inter = Inter({
   display: "swap",
 });
 
+// Un solo título y una sola descripción para el buscador y para las tarjetas
+// de redes: quien recibe el enlace compartido lee lo mismo que quien lo
+// encuentra buscando.
+const title = "DJ Swarthy | DJ de trance y progressive en Madrid · Booking";
+const description =
+  "DJ Swarthy, DJ y productor en Madrid con más de 19 años en cabina: trance, progressive, tech house y remember. Pide propuesta para tu sala o evento.";
+
+// Verificación de propiedad en Search Console y Bing: sólo se emite la
+// etiqueta del token que esté relleno en lib/site.ts.
+const verification: NonNullable<Metadata["verification"]> = {
+  ...(GOOGLE_SITE_VERIFICATION && { google: GOOGLE_SITE_VERIFICATION }),
+  ...(BING_SITE_VERIFICATION && { other: { "msvalidate.01": BING_SITE_VERIFICATION } }),
+};
+
 // La imagen social (OpenGraph/Twitter, 1200x630) la genera app/opengraph-image.tsx
 // por convención de ficheros: no se declara aquí.
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "DJ Swarthy | DJ en Madrid · Contratar DJ para clubs y eventos",
+    default: title,
     template: "%s | DJ Swarthy",
   },
-  description:
-    "DJ Swarthy, DJ en Madrid con 19 años de experiencia: trance, tech house, house y remember. Contrata un DJ para clubs, festivales, bodas y eventos privados.",
+  description,
   applicationName: SITE_NAME,
   authors: [{ name: "DJ Swarthy", url: SITE_URL }],
   referrer: "strict-origin-when-cross-origin",
   creator: "DJ Swarthy",
   publisher: "DJ Swarthy",
+  // "./" se resuelve contra la ruta de cada página (con metadataBase): una
+  // página nueva sin canónica propia se declara a sí misma. Con la URL de la
+  // portada fija aquí, declararía que su original es la home.
   alternates: {
-    canonical: SITE_URL,
+    canonical: "./",
   },
   category: "Music",
+  // Next no mezcla `openGraph` ni `twitter` con los de una página: los
+  // sustituye enteros. Las rutas que declaran los suyos parten de las mismas
+  // bases (lib/site.ts) para no perder og:site_name, og:locale ni la cuenta.
   openGraph: {
-    type: "website",
-    locale: "es_ES",
+    ...OPEN_GRAPH_BASE,
     url: SITE_URL,
-    siteName: SITE_NAME,
-    title: "DJ Swarthy — DJ profesional en Madrid · Booking abierto",
-    description:
-      "DJ con 19 años de experiencia. Trance, house, tech house, nu disco y remember. Disponible para clubs, festivales y eventos privados.",
+    title,
+    description,
   },
   twitter: {
-    card: "summary_large_image",
-    title: "DJ Swarthy — DJ profesional en Madrid",
-    description:
-      "19 años pinchando trance, house, tech house y nu disco. Booking abierto para clubs, festivales y eventos.",
-    creator: "@DjSwarthy",
+    ...TWITTER_BASE,
+    title,
+    description,
   },
   robots: {
     index: true,
@@ -66,6 +87,7 @@ export const metadata: Metadata = {
       "max-video-preview": -1,
     },
   },
+  verification,
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },
@@ -93,16 +115,28 @@ export default function RootLayout({
       className={`${bebas.variable} ${inter.variable}`}
     >
       <head>
-        {/* Se construye en cada render: el nodo de eventos depende de la fecha. */}
+        {/* Sólo la entidad (artista y sitio), que vale para todas las rutas.
+            Lo que depende de la página (servicio, FAQ, fechas, migas) lo
+            emite cada página en su propio script: desde aquí no se sabe qué
+            ruta se pinta sin leer headers(), y eso volvería dinámica la home. */}
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: buildJsonLdString() }}
+          dangerouslySetInnerHTML={{ __html: buildJsonLdString(baseNodes()) }}
         />
         {/* Sólo Plausible: los reproductores de YouTube/SoundCloud/Spotify son
             fachadas que no conectan con nadie hasta el clic, y las miniaturas
             se sirven desde /_next/image (mismo origen), así que preconectar
             con esos dominios en cada visita era trabajo inútil. */}
         <link rel="preconnect" href="https://plausible.io" />
+        {/* Sin JavaScript nada hidrata y los bloques de Reveal se quedan como
+            los sirve el servidor, con `opacity:0;transform:…` en línea: la
+            portada en blanco del hero para abajo. Este estilo sólo se aplica
+            cuando no hay scripts y los deja a la vista. El `;` del selector
+            evita tocar un `opacity:0.5`. La CSP lo admite: style-src lleva
+            'unsafe-inline' (next.config.ts). */}
+        <noscript>
+          <style>{`[style*="opacity:0;"]{opacity:1!important;transform:none!important}`}</style>
+        </noscript>
       </head>
       <body className="bg-dark-primary text-text-primary antialiased">
         <a
