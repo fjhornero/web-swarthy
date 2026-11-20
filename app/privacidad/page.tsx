@@ -3,24 +3,32 @@ import Link from "next/link";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { site } from "@/lib/data";
-import { SITE_URL } from "@/lib/site";
+import { SITE_URL, OPEN_GRAPH_BASE, TWITTER_BASE } from "@/lib/site";
 
 const description =
   "Cómo trata DJ Swarthy los datos personales enviados a través de los formularios de contratación y contacto de djswarthy.es.";
 
+// Título de las tarjetas de redes: `openGraph` y `twitter` no pasan por la
+// plantilla de título del layout, así que llevan el nombre del sitio a mano.
+const socialTitle = "Política de privacidad | DJ Swarthy";
+
 // Página legal: enlazada desde el footer y los formularios, pero fuera del
 // índice (noindex, follow) y del sitemap. No aporta nada a la búsqueda.
+// openGraph y twitter se declaran enteros porque Next no los mezcla con los
+// del layout, los sustituye: parten de las bases de lib/site.ts y la imagen
+// la pone el opengraph-image.tsx de esta carpeta.
 export const metadata: Metadata = {
   title: "Política de privacidad",
   description,
   alternates: { canonical: `${SITE_URL}/privacidad` },
   robots: { index: false, follow: true },
   openGraph: {
-    type: "website",
+    ...OPEN_GRAPH_BASE,
     url: `${SITE_URL}/privacidad`,
-    title: "Política de privacidad | DJ Swarthy",
+    title: socialTitle,
     description,
   },
+  twitter: { ...TWITTER_BASE, title: socialTitle, description },
 };
 
 export default function PrivacidadPage() {

@@ -23,7 +23,9 @@ export function Hero() {
 
       {/* Retrato. Decorativo (el que lleva alt está en About), pero es lo más
           grande del primer pantallazo y por tanto el LCP: va con `priority`
-          para que se precargue en vez de esperar a la carga diferida. */}
+          para que se precargue en vez de esperar a la carga diferida, y con
+          `fetchPriority` explícito porque en Next 15 `priority` ya no lo pone
+          ni en la etiqueta ni en la precarga. */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-x-0 top-0 h-[68svh] opacity-70 [mask-image:linear-gradient(to_bottom,black_45%,transparent)] md:inset-y-0 md:left-auto md:right-0 md:h-auto md:w-[56%] md:opacity-90 md:[mask-image:linear-gradient(to_left,black_55%,transparent)]"
@@ -33,6 +35,7 @@ export function Hero() {
           alt=""
           fill
           priority
+          fetchPriority="high"
           // En tablet la columna del retrato es estrecha y alta: se encuadra
           // hacia la izquierda de la foto para que la cara quede a la derecha,
           // lejos del texto.
@@ -58,11 +61,9 @@ export function Hero() {
           </p>
 
           {/* Titular: sin animación de opacidad a propósito, para que se pinte
-              con el primer render. El sufijo sólo para lectores de pantalla
-              pone la intención de búsqueda ("DJ en Madrid") en el h1. */}
+              con el primer render. */}
           <h1 className="whitespace-nowrap font-display text-[clamp(3.75rem,21vw,5.5rem)] uppercase leading-[0.85] tracking-tight md:text-8xl lg:text-9xl xl:text-[10.5rem]">
             {site.hero.name}
-            <span className="sr-only">, DJ en Madrid</span>
           </h1>
 
           <p

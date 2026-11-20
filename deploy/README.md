@@ -1,9 +1,10 @@
 # Despliegue en 143.47.52.87
 
 El acceso al servidor es con el usuario **`ubuntu`** (`ssh ubuntu@143.47.52.87`), que ya
-está en el grupo `docker`: ningún comando de este documento necesita `sudo`. No se entra
-como `root`. La máquina es **aarch64 (ARM)**, así que la imagen se construye nativamente
-en arm64 — otra razón para no construirla fuera del servidor.
+está en el grupo `docker`: los comandos de Docker de este documento no necesitan `sudo`
+(los de nginx, que es del host, sí). No se entra como `root`. La máquina es **aarch64
+(ARM)**, así que la imagen se construye nativamente en arm64 — otra razón para no
+construirla fuera del servidor.
 
 ## Prerequisitos en el servidor
 
@@ -178,6 +179,55 @@ El paso `up -d` solo recrea el contenedor si la imagen cambió. Si quieres forza
 docker compose up -d --force-recreate
 ```
 
+## Cambios en el vhost de nginx
+
+El despliegue automático sólo reconstruye el contenedor: **no toca nginx**. Un cambio en
+`deploy/nginx-djswarthy.conf` no llega a producción hasta que se copia sobre el vhost del
+servidor y se recarga nginx:
+
+```bash
+cd /opt/web-swarthy
+diff -u /etc/nginx/sites-available/djswarthy.es deploy/nginx-djswarthy.conf   # qué va a cambiar
+sudo cp -p /etc/nginx/sites-available/djswarthy.es ~/djswarthy.es.vhost.bak   # para volver atrás
+sudo cp deploy/nginx-djswarthy.conf /etc/nginx/sites-available/djswarthy.es
+sudo nginx -t && sudo systemctl reload nginx
+```
+
+Si el `diff` enseña en el servidor algo que no está en el repo, llévalo antes al repo: la
+copia lo pisaría. Si `nginx -t` falla no se recarga nada y nginx sigue con la configuración
+que tenía, pero restaura la copia: un vhost roto en disco impide arrancar a nginx, con
+todos sus sitios, en el siguiente reinicio.
+
+### Límite de peticiones de los formularios
+
+El vhost limita por IP **sólo los POST**, que son los envíos de los dos formularios (server
+actions): 10 por minuto, con una ráfaga de 5 (hasta 6 envíos seguidos). Las páginas, las
+imágenes, `robots.txt` y `sitemap.xml` no cuentan. Quien lo supera recibe un 503 de nginx y
+el formulario enseña su error genérico. Complementa al límite de la app
+(`lib/rate-limit.ts`), más estricto, que vive en memoria y se pone a cero en cada despliegue.
+
+Para ver qué límite tiene el servidor:
+
+```bash
+sudo nginx -T | grep -n limit_req
+```
+
+De esta web tienen que salir dos líneas: la zona `swarthy_form_posts`, definida sobre
+`$swarthy_form_posts_key`, y su `limit_req` en `location /`. Si sale
+`limit_req_zone $binary_remote_addr zone=swarthy_forms`, el servidor tiene la versión
+anterior, que contaba también las páginas y las imágenes y devolvía 503 a visitantes y
+rastreadores: copia el vhost y recarga.
+
+`nginx -T` lee los ficheros del disco, que sólo son lo que nginx está sirviendo si la
+última recarga salió bien; una recarga que nginx rechaza no da error en la terminal, lo
+deja en su log de errores (por defecto, `/var/log/nginx/error.log`). La comprobación que
+no engaña es pedir una página 40 veces seguidas: tienen que salir 40 respuestas 200 (con
+la versión anterior, los 503 empezaban hacia la petición 32).
+
+```bash
+for i in $(seq 40); do curl -s -o /dev/null -w '%{http_code}\n' https://djswarthy.es/robots.txt; done | sort | uniq -c
+```
+
 ## Logs y troubleshooting
 
 ```bash
@@ -192,3 +242,6 @@ Si nginx devuelve 502: nginx no consigue hablar con `127.0.0.1:3001`. Por orden,
 que el contenedor está arriba (`docker compose ps`), que el puerto aparece publicado en el
 loopback (`ss -ltnp`), y que el `curl` directo responde. Si el `curl` va pero nginx no, el
 problema está en el `proxy_pass` del vhost, no en el contenedor.
+
+Si nginx devuelve 503 con el contenedor sano, lo normal es que no sea una caída sino el
+límite de peticiones: ver *Límite de peticiones de los formularios*.

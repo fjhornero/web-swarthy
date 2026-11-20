@@ -18,6 +18,7 @@ import { getLatestYouTubeVideos, getLatestSoundCloudTracks } from "@/lib/feeds";
 import { getSpotifyReleases, getSpotifyArtistCard } from "@/lib/spotify";
 import { splitMixes, toMixCard } from "@/lib/mixes";
 import { upcomingDates } from "@/lib/dates";
+import { buildJsonLdString, homeNodes } from "@/lib/json-ld";
 import { site } from "@/lib/data";
 
 // La home se prerrenderiza y se regenera como mucho cada hora: los feeds ya
@@ -55,6 +56,13 @@ export default async function Home() {
 
   return (
     <>
+      {/* Datos estructurados de lo que sólo enseña la portada: el servicio
+          de booking, la FAQ y las fechas. El artista y el sitio, a los que
+          apuntan por @id, los declara el layout en todas las rutas. */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: buildJsonLdString(homeNodes()) }}
+      />
       <Navbar />
       <main id="main-content">
         {/* Orden del embudo del promotor: escuchar y ver dónde ha pinchado,

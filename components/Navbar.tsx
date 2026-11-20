@@ -93,8 +93,13 @@ export function Navbar() {
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-5 py-4 md:px-8">
         <Link href="/#top" className="flex shrink-0 items-center gap-3" aria-label="DJ Swarthy, inicio">
           {/* SVG con transparencia real: el PNG original es una silueta sobre
-              blanco y, invertido, dejaba un cuadrado negro sobre el glow. */}
-          <Image src="/logo-isotype-white.svg" alt="" width={36} height={36} unoptimized priority />
+              blanco y, invertido, dejaba un cuadrado negro sobre el glow.
+              Sin `priority`, que es para el LCP (el retrato del hero): con
+              `loading="eager"` un logo siempre a la vista no espera a la
+              carga diferida. React precarga igualmente cualquier imagen no
+              diferida del primer render, pero con prioridad normal; la alta
+              la lleva el retrato (`fetchPriority`). */}
+          <Image src="/logo-isotype-white.svg" alt="" width={36} height={36} unoptimized loading="eager" />
           <span className="font-display text-2xl tracking-wider" aria-hidden="true">
             SWARTHY
           </span>

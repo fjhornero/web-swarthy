@@ -48,6 +48,25 @@ const securityHeaders = [
   { key: "Content-Security-Policy", value: csp },
 ];
 
+// Caché de navegador para las imágenes, logos e iconos de public/ y para el
+// favicon (vive en app/, pero se sirve en /favicon.ico). Next los entrega con
+// `max-age=0` y el navegador revalidaba en cada visita los que no pasan por
+// /_next/image: el isotipo de la cabecera y del pie, los iconos y las
+// descargas del press kit. Un día y no más porque estos nombres no llevan
+// hash: un fichero sustituido con el mismo nombre tarda como mucho ese día en
+// llegar a quien ya lo tenía. Coincide a propósito con `minimumCacheTTL`: el
+// optimizador caduca cada imagen local con el mayor de los dos valores, así
+// que /_next/image se queda como estaba. /_next/static no casa con estas
+// rutas y conserva su caché `immutable`.
+const publicAssetHeaders = [{ key: "Cache-Control", value: "public, max-age=86400" }];
+const publicAssetSources = [
+  "/images/:path*",
+  "/logo-:file",
+  "/icon-:file",
+  "/apple-touch-icon.png",
+  "/favicon.ico",
+];
+
 const nextConfig: NextConfig = {
   output: "standalone",
   // No anunciar el framework en cada respuesta (X-Powered-By).
@@ -74,6 +93,12 @@ const nextConfig: NextConfig = {
         source: "/:path*",
         headers: securityHeaders,
       },
+      // Sólo añaden Cache-Control: las cabeceras de seguridad de la regla de
+      // arriba siguen aplicándose a estas rutas. En desarrollo no se emiten,
+      // para que un fichero sustituido en public/ se vea al recargar.
+      ...(isDev
+        ? []
+        : publicAssetSources.map((source) => ({ source, headers: publicAssetHeaders }))),
     ];
   },
 };

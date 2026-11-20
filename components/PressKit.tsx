@@ -15,17 +15,22 @@ const LABELS: Record<Lang, { name: string; short: string; long: string; copy: st
   es: { name: "Español", short: "Bio corta", long: "Bio larga", copy: "Copiar", copied: "Copiado" },
   en: { name: "English", short: "Short bio", long: "Long bio", copy: "Copy", copied: "Copied" },
 };
+const LANGS = Object.keys(LABELS) as Lang[];
 
 /**
  * Las bios del press kit, en español e inglés y con botón de copiar. Quien
  * anuncia una fecha pega la bio en la web de la sala, en el evento de
  * Facebook o en una nota de prensa: se lo damos listo en vez de obligarle a
  * seleccionar el texto a mano, y en inglés para el promotor de fuera.
+ *
+ * Las dos lenguas están siempre en el HTML y la que no se ha elegido lleva
+ * `hidden`: cuando sólo se montaba la elegida, la bio en inglés no existía
+ * para los buscadores ni para los asistentes de IA, que no pulsan el
+ * conmutador. Cada bloque tiene sus propios botones, así que siempre se copia
+ * la lengua que se ve.
  */
 export function PressBios({ bios }: { bios: Record<Lang, Bio> }) {
   const [lang, setLang] = useState<Lang>("es");
-  const t = LABELS[lang];
-  const bio = bios[lang];
 
   return (
     <div>
@@ -34,7 +39,7 @@ export function PressBios({ bios }: { bios: Record<Lang, Bio> }) {
         aria-label="Idioma de la biografía"
         className="mb-6 inline-flex rounded-full border border-border-dark bg-dark-secondary p-1 print:hidden"
       >
-        {(Object.keys(LABELS) as Lang[]).map((code) => (
+        {LANGS.map((code) => (
           <button
             key={code}
             type="button"
@@ -52,10 +57,16 @@ export function PressBios({ bios }: { bios: Record<Lang, Bio> }) {
         ))}
       </div>
 
-      <div lang={lang}>
-        <BioBlock title={t.short} text={bio.short} copy={t.copy} copied={t.copied} />
-        <BioBlock title={t.long} text={bio.long} copy={t.copy} copied={t.copied} className="mt-10" />
-      </div>
+      {LANGS.map((code) => {
+        const t = LABELS[code];
+        const bio = bios[code];
+        return (
+          <div key={code} lang={code} hidden={code !== lang}>
+            <BioBlock title={t.short} text={bio.short} copy={t.copy} copied={t.copied} />
+            <BioBlock title={t.long} text={bio.long} copy={t.copy} copied={t.copied} className="mt-10" />
+          </div>
+        );
+      })}
     </div>
   );
 }

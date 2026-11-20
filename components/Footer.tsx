@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { NewTabHint } from "@/components/NewTabHint";
 import { site } from "@/lib/data";
+import { sentenceList } from "@/lib/site";
 
 const footerLinks = [
   { href: "/#venues", label: "Clubs" },
@@ -25,8 +26,10 @@ export function Footer() {
                 SWARTHY
               </span>
             </Link>
+            {/* Los estilos salen de la lista única de lib/data.ts: escritos a
+                mano se quedaron sin «progressive» cuando entró en ella. */}
             <p className="mt-4 max-w-xs text-sm text-text-secondary">
-              DJ profesional en Madrid. Trance, house, tech house, nu disco y remember.
+              DJ profesional en Madrid. {sentenceList(site.genres)}.
               Booking abierto para clubs, festivales y eventos privados.
             </p>
             <p className="mt-3 text-xs text-text-secondary">

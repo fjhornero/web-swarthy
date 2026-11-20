@@ -38,7 +38,9 @@ export function Releases({ releases, artist, productions }: ReleasesProps) {
           overline="MÚSICA PROPIA"
           title={
             <>
-              Sus <span className="text-gradient">lanzamientos</span>
+              {/* Espacio duro: cuando el título ocupa dos líneas, que no quede
+                  «propios» solo en la segunda. */}
+              <span className="text-gradient">Producciones</span> y lanzamientos&nbsp;propios
             </>
           }
         >

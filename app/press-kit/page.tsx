@@ -7,23 +7,31 @@ import { Footer } from "@/components/Footer";
 import { NewTabHint } from "@/components/NewTabHint";
 import { PressBios, PrintButton } from "@/components/PressKit";
 import { site } from "@/lib/data";
-import { SITE_URL, CONTENT_UPDATED_AT } from "@/lib/site";
+import { buildJsonLdString, pressKitNodes } from "@/lib/json-ld";
+import { SITE_URL, CONTENT_UPDATED_AT, OPEN_GRAPH_BASE, TWITTER_BASE } from "@/lib/site";
 
+const title = "Press kit de DJ Swarthy: bio, rider y material gráfico";
 const description =
   "Dossier de prensa de DJ Swarthy: biografía en español e inglés, rider técnico, retrato, logotipos y contacto de booking.";
 
-// openGraph se declara aquí porque Next no lo hereda del layout en profundidad:
-// sin esto, compartir /press-kit mostraría la url y el título de la portada.
+// openGraph y twitter se declaran aquí enteros porque Next no los mezcla con
+// los del layout: los sustituye. Por eso parten de las bases de lib/site.ts
+// (sin ellas se perdían og:site_name y og:locale) y llevan su propio título
+// (sin `twitter`, la tarjeta de /press-kit salía con el de la portada). La
+// imagen la pone el opengraph-image.tsx de esta carpeta.
 export const metadata: Metadata = {
-  title: "Press kit",
+  // Absoluto: ya lleva el nombre del artista y la plantilla del layout lo
+  // añadiría otra vez.
+  title: { absolute: title },
   description,
   alternates: { canonical: `${SITE_URL}/press-kit` },
   openGraph: {
-    type: "website",
+    ...OPEN_GRAPH_BASE,
     url: `${SITE_URL}/press-kit`,
-    title: "Press kit | DJ Swarthy",
+    title,
     description,
   },
+  twitter: { ...TWITTER_BASE, title, description },
 };
 
 // Un dossier sin fecha no se sabe si está vigente. CONTENT_UPDATED_AT es un
@@ -46,14 +54,23 @@ const listenLinks = site.socials.filter((s) => s.label in LISTEN);
 export default function PressKitPage() {
   return (
     <>
+      {/* Migas de pan de esta página (Inicio → Press kit). El artista y el
+          sitio los declara el layout en todas las rutas. */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: buildJsonLdString(pressKitNodes()) }}
+      />
       <Navbar />
       <main id="main-content" className="bg-dark-primary pb-24 pt-32 md:pt-40 print:pb-0 print:pt-0">
         <div className="mx-auto max-w-4xl px-5 md:px-8 print:max-w-none print:px-0">
           <p className="mb-3 text-xs uppercase tracking-[0.2em] text-accent-orange">
-            <span aria-hidden="true">★ </span>PRESS KIT
+            <span aria-hidden="true">★ </span>DOSSIER DE PRENSA
           </p>
+          {/* El h1 lleva el nombre del artista y el término que se busca
+              («press kit»); el sobretítulo, su equivalente en español, para
+              no repetirlo. El nombre no se parte entre dos líneas en móvil. */}
           <h1 className="font-display text-4xl uppercase leading-[0.95] md:text-6xl">
-            Dossier de <span className="text-gradient">prensa</span>
+            Press kit de <span className="whitespace-nowrap text-gradient">DJ Swarthy</span>
           </h1>
           <p className="mt-5 max-w-2xl text-base leading-relaxed text-text-secondary md:text-lg">
             Todo lo que necesitas para anunciar una fecha con Swarthy: biografía,
@@ -114,6 +131,33 @@ export default function PressKitPage() {
                   <a href={`mailto:${site.bookingEmail}`} className="hover:text-accent-orange">
                     {site.bookingEmail}
                   </a>
+                }
+              />
+              {/* Todos los perfiles oficiales, enlazados: la lista con la que
+                  un medio comprueba que una cuenta es la suya. Ocupa las dos
+                  columnas para no dejar un hueco en la rejilla. */}
+              <FactRow
+                className="sm:col-span-2"
+                term="Perfiles"
+                value={
+                  <ul className="flex flex-wrap gap-x-4 gap-y-1">
+                    {site.socials.map((s) => (
+                      <li key={s.label}>
+                        <a
+                          href={s.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="hover:text-accent-orange"
+                        >
+                          {s.label}{" "}
+                          <span aria-hidden="true" className="print:hidden">
+                            ↗
+                          </span>
+                          <NewTabHint />
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
                 }
               />
             </dl>
@@ -265,9 +309,17 @@ export default function PressKitPage() {
   );
 }
 
-function FactRow({ term, value }: { term: string; value: React.ReactNode }) {
+function FactRow({
+  term,
+  value,
+  className = "",
+}: {
+  term: string;
+  value: React.ReactNode;
+  className?: string;
+}) {
   return (
-    <div className="bg-dark-secondary px-5 py-4">
+    <div className={`bg-dark-secondary px-5 py-4 ${className}`}>
       <dt className="text-xs uppercase tracking-[0.15em] text-text-secondary">
         {term}
       </dt>

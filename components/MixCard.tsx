@@ -1,5 +1,7 @@
+import Link from "next/link";
 import { Music, Youtube } from "lucide-react";
 import { MediaFacade } from "@/components/MediaFacade";
+import { NewTabHint } from "@/components/NewTabHint";
 import { MIX_STYLES, type MixCardData } from "@/lib/mixes";
 
 /**
@@ -98,7 +100,25 @@ export function MixCard({ mix, className = "bg-dark-primary" }: { mix: MixCardDa
         </div>
       </div>
       <div className="flex min-w-0 flex-1 flex-col justify-center gap-1.5 p-3 sm:justify-start sm:gap-2 sm:p-4">
-        <p className="line-clamp-2 text-sm font-medium leading-snug">{mix.title}</p>
+        {/* El título enlaza a la sesión en su plataforma: quien prefiere oírla
+            allí llega desde aquí, y los buscadores encuentran cada sesión
+            enlazada por su nombre. El recorte a dos líneas va dentro del
+            enlace y no en el párrafo: recortado desde fuera, el anillo de
+            foco salía cortado. */}
+        <p className="text-sm font-medium leading-snug">
+          <Link
+            href={mix.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block transition-colors hover:text-accent-orange"
+          >
+            <span className="line-clamp-2">{mix.title}</span>
+            <span className="sr-only">
+              {mix.kind === "video" ? " en YouTube" : " en SoundCloud"}
+            </span>
+            <NewTabHint />
+          </Link>
+        </p>
         <MixMeta mix={mix} />
       </div>
     </article>

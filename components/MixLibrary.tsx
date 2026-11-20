@@ -5,6 +5,7 @@ import { MixCard } from "@/components/MixCard";
 import { MIX_STYLES, type MixCardData, type MixStyle } from "@/lib/mixes";
 
 // Cuántas sesiones se ven antes de pulsar "Ver las N": dos filas en escritorio.
+// Las demás van en el HTML igualmente, plegadas.
 const INITIAL_COUNT = 6;
 
 type Filter = MixStyle | "all";
@@ -29,7 +30,6 @@ export function MixLibrary({ mixes }: { mixes: MixCardData[] }) {
   );
 
   const filtered = filter === "all" ? mixes : mixes.filter((mix) => mix.style === filter);
-  const visible = expanded ? filtered : filtered.slice(0, INITIAL_COUNT);
   const collapsible = filtered.length > INITIAL_COUNT;
 
   const toggleExpanded = () => {
@@ -77,12 +77,26 @@ export function MixLibrary({ mixes }: { mixes: MixCardData[] }) {
         {filter !== "all" && ` de ${MIX_STYLES[filter]}`}
       </p>
 
+      {/* Todas las sesiones del filtro están en el HTML, no sólo las primeras:
+          así las leen los buscadores y los asistentes de IA sin pulsar "Ver
+          las N". Las que pasan de INITIAL_COUNT se pliegan con `hidden`
+          (display: none), y por eso sus miniaturas, que son `lazy`, no se
+          descargan hasta que se despliegan. */}
       <ul className="grid gap-3 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
-        {visible.map((mix) => (
-          <li key={mix.key}>
-            <MixCard mix={mix} />
-          </li>
-        ))}
+        {filtered.map((mix, i) => {
+          const folded = !expanded && i >= INITIAL_COUNT;
+          return (
+            <li key={mix.key} className={folded ? "hidden" : undefined}>
+              {/* La `key` cambia cuando la tarjeta se pliega: React la monta
+                  de nuevo y la instancia anterior se lleva su iframe
+                  (usePlayer suelta el reproductor al desmontarse). Sin esto,
+                  una sesión abierta seguiría sonando dentro de una tarjeta que
+                  ya no se ve, al pulsar "Ver menos" o al volver de un filtro
+                  a "Todas". */}
+              <MixCard key={folded ? "folded" : "shown"} mix={mix} />
+            </li>
+          );
+        })}
       </ul>
 
       {collapsible && (
